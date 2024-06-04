@@ -125,6 +125,9 @@
         };
         devShells.default = self.devShells.${system}.zonewatch;
       }) // {
+        nixosModules.zonewatch = import ./nix/module.nix;
+        nixosModules.default = self.nixosModules.zonewatch;
+
         overlays.zonewatch = import ./nix/overlay.nix (import ./nix/builder.nix) crane fenix;
         overlays.default = self.overlays.zonewatch;
       };
