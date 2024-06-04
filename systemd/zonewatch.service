@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
+[Unit]
+After=network.target
+Description=zonewatch DNS Zone File Watcher
+StartLimitBurst=1
+
+[Service]
+CapabilityBoundingSet=
+DeviceAllow=
+DevicePolicy=closed
+DynamicUser=true
+ExecStart=/usr/local/bin/zonewatch --config /etc/zonewatch/config.toml
+KillSignal=SIGINT
+LockPersonality=true
+MemoryDenyWriteExecute=true
+Nice=1
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+PrivateUsers=true
+ProcSubset=pid
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ReadWritePaths=
+RemoveIPC=true
+Restart=on-failure
+RestrictAddressFamilies=none
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+StateDirectory=zonewatch
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+SystemCallFilter=@chown # The tempfile-fast rust crate tries to keep the old permissions, so we need to allow this class of system calls
+Type=simple
+UMask=0077
+
+Environment="RUST_LOG_STYLE=SYSTEMD"
+
+# Uncomment for maximum verbosity
+#Environment="RUST_LOG=zonewatch=trace"
+
+[Install]
+WantedBy=multi-user.target

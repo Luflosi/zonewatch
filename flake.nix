@@ -40,6 +40,7 @@
           craneLibLLvmTools
           cargoArtifacts
           zonewatch
+          zonewatch-full
         ;
       in
       {
@@ -97,7 +98,7 @@
         };
 
         packages = {
-          inherit zonewatch;
+          zonewatch = zonewatch-full;
           default = self.packages.${system}.zonewatch;
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
           zonewatch-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {

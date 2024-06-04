@@ -51,4 +51,13 @@ rec {
   zonewatch = craneLib.buildPackage (commonArgs // {
     inherit cargoArtifacts;
   });
+
+  zonewatch-systemd-unit = pkgs.runCommand "zonewatch-systemd-unit" { } ''
+    install --mode=444 -D '${../systemd/zonewatch.service}' "$out/etc/systemd/system/zonewatch.service"
+  '';
+
+  zonewatch-full = pkgs.symlinkJoin {
+    name = "zonewatch-full";
+    paths = [ zonewatch zonewatch-systemd-unit ];
+  };
 }
