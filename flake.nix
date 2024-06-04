@@ -119,18 +119,20 @@
         };
 
         packages = {
-          default = zonewatch;
+          inherit zonewatch;
+          default = self.packages.${system}.zonewatch;
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
           zonewatch-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
             inherit cargoArtifacts;
           });
         };
 
-        apps.default = flake-utils.lib.mkApp {
+        apps.zonewatch = flake-utils.lib.mkApp {
           drv = zonewatch;
         };
+        apps.default = self.apps.${system}.zonewatch;
 
-        devShells.default = craneLib.devShell {
+        devShells.zonewatch = craneLib.devShell {
           # Inherit inputs from checks.
           checks = self.checks.${system};
 
@@ -142,5 +144,6 @@
             sqlx-cli
           ];
         };
+        devShells.default = self.devShells.${system}.zonewatch;
       });
 }
