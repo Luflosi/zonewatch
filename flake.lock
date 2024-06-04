@@ -36,6 +36,38 @@
         "type": "github"
       }
     },
+    "dyndnsd": {
+      "inputs": {
+        "advisory-db": [
+          "advisory-db"
+        ],
+        "crane": [
+          "crane"
+        ],
+        "fenix": [
+          "fenix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1717375277,
+        "narHash": "sha256-YKdK+7tMAGR6tSckoE5j8zCSzTlR5vFCrjS47Rxgb2k=",
+        "owner": "Luflosi",
+        "repo": "dyndnsd",
+        "rev": "b4016bcdb07f5d0a2258d4f879705a917508d1db",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Luflosi",
+        "repo": "dyndnsd",
+        "type": "github"
+      }
+    },
     "fenix": {
       "inputs": {
         "nixpkgs": [
@@ -95,9 +127,11 @@
       "inputs": {
         "advisory-db": "advisory-db",
         "crane": "crane",
+        "dyndnsd": "dyndnsd",
         "fenix": "fenix",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "zonegen": "zonegen"
       }
     },
     "systems": {
@@ -112,6 +146,41 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "zonegen": {
+      "inputs": {
+        "advisory-db": [
+          "advisory-db"
+        ],
+        "crane": [
+          "crane"
+        ],
+        "dyndnsd": [
+          "dyndnsd"
+        ],
+        "fenix": [
+          "fenix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1717442192,
+        "narHash": "sha256-kdMh6gkZTrbBB4/EVuQ8NoAxGa3Nd4y1rq0ol0d7cqE=",
+        "owner": "Luflosi",
+        "repo": "zonegen",
+        "rev": "d05cf484e102a432b32b63aa0cb12b5746d277d2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Luflosi",
+        "repo": "zonegen",
         "type": "github"
       }
     }

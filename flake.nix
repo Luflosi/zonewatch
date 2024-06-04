@@ -24,12 +24,38 @@
       url = "github:rustsec/advisory-db";
       flake = false;
     };
+
+    dyndnsd = {
+      url = "github:Luflosi/dyndnsd";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.crane.follows = "crane";
+      inputs.fenix.follows = "fenix";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.advisory-db.follows = "advisory-db";
+    };
+
+    zonegen = {
+      url = "github:Luflosi/zonegen";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.crane.follows = "crane";
+      inputs.fenix.follows = "fenix";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.advisory-db.follows = "advisory-db";
+      inputs.dyndnsd.follows = "dyndnsd";
+    };
   };
 
   outputs = { self, nixpkgs, crane, fenix, flake-utils, advisory-db, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            self.outputs.overlays.zonewatch
+            self.inputs.zonegen.overlays.zonegen
+            self.inputs.dyndnsd.overlays.dyndnsd
+          ];
+        };
 
         builder = import ./nix/builder.nix { inherit crane fenix pkgs system; };
         inherit (builder)
@@ -95,6 +121,10 @@
             reuse lint
             touch "$out"
           '';
+
+        # NixOS tests don't run on macOS
+        } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+          zonewatch-e2e-test = pkgs.testers.runNixOSTest (import ./nix/tests/NixOS-integration-test.nix self);
         };
 
         packages = {
