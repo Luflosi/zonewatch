@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
 [package]
 name = "zonewatch"
 version = "0.1.0"

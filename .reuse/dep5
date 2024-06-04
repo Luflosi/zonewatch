@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: zonewatch
+Upstream-Contact: Luflosi <zonewatch@luflosi.de>
+Source: https://github.com/Luflosi/zonewatch
+
+Files: *.lock
+Copyright: 2024 Luflosi <zonewatch@luflosi.de>
+License: CC0-1.0

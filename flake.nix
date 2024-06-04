@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: GPL-3.0-only
+
 {
   description = "Build zonewatch";
 
@@ -116,6 +119,15 @@
             partitions = 1;
             partitionType = "count";
           });
+
+          zonewatch-reuse = pkgs.runCommand "run-reuse" {
+            src = ./.;
+            nativeBuildInputs = with pkgs; [ reuse ];
+          } ''
+            cd "$src"
+            reuse lint
+            touch "$out"
+          '';
         };
 
         packages = {
