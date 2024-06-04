@@ -122,6 +122,8 @@
             touch "$out"
           '';
 
+          zonewatch-check-example-config = pkgs.callPackage ./nix/tests/check-example-config.nix { };
+
         # NixOS tests don't run on macOS
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
           zonewatch-e2e-test = pkgs.testers.runNixOSTest (import ./nix/tests/NixOS-integration-test.nix self);

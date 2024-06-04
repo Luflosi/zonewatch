@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
+db = "/var/lib/zonewatch/db.sqlite"
+reload_program_bin = "rndc"
+
+[zones."example.org"]
+dir = "/var/lib/bind/zones" # Where to store this zone file
+reload_program_args = ["reload", "example.org"]
+ttl = "1d" # Default TTL for the zone
+includes = [
+	# Absolute paths
+	"/path/to/file 1.zone",
+	"/path/to/file 2.zone",
+]
+
+[zones."example.org".soa]
+ttl = "1d"
+mname = "ns1.example.org."
+rname = "john\\.doe.example.org."
+refresh = "1d"
+retry = "2h"
+expire = "1000h"
+minimum = "1h" # Negative response caching TTL
