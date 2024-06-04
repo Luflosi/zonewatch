@@ -124,5 +124,8 @@
           ];
         };
         devShells.default = self.devShells.${system}.zonewatch;
-      });
+      }) // {
+        overlays.zonewatch = import ./nix/overlay.nix (import ./nix/builder.nix) crane fenix;
+        overlays.default = self.overlays.zonewatch;
+      };
 }
