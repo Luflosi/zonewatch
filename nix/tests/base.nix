@@ -42,6 +42,8 @@ let
     };
   };
 
+  config-file = (formats.toml { }).generate "config.toml" config;
+
   generate-zone-string = zone-name: zone: serial: let
     includes = lib.concatMapStrings (include: "$INCLUDE ${include}\n") zone.includes;
   in ''
@@ -63,10 +65,41 @@ let
   generate-zone = zone-name: zone: serial: let
     zone-string = generate-zone-string zone-name zone serial;
   in writeText "expected.zone" zone-string;
+
+  expected-zone = generate-zone "example.org" config.zones."example.org" 1;
+
+  state-after-initial-run = runCommand "zonewatch-initial-run" { } ''
+    mkdir --verbose db
+    export RUST_LOG=zonewatch=trace
+    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file}'
+    if ! diff '${expected-zone}' 'zones/example.org.zone'; then
+      echo 'The zone file is different from what was expected!'
+      echo 'Expected:'
+      cat -v '${expected-zone}'
+      echo 'Actual:'
+      cat -v 'zones/example.org.zone'
+      exit 1
+    fi
+    echo 'The zone file is exactly what we expected 🎉'
+
+    if [ ! -e flag ]; then
+      echo 'The update program was not called!'
+      exit 1
+    fi
+
+    mkdir -p "$out"
+    cp -r db zones "$out"
+  '';
 in
   {
     inherit
+      ns-record
+      ns-ip
       config
+      config-file
+      generate-zone-string
       generate-zone
+      expected-zone
+      state-after-initial-run
     ;
   }

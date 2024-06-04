@@ -122,7 +122,17 @@
             touch "$out"
           '';
 
+          zonewatch-check-package-files = pkgs.callPackage ./nix/tests/check-package-files.nix { };
           zonewatch-check-example-config = pkgs.callPackage ./nix/tests/check-example-config.nix { };
+          zonewatch-test-include-missing = pkgs.callPackage ./nix/tests/test-include-missing.nix { };
+          zonewatch-test-include-no-permission = pkgs.callPackage ./nix/tests/test-include-no-permission.nix { };
+          zonewatch-test-no-change = pkgs.callPackage ./nix/tests/test-no-change.nix { };
+          zonewatch-test-includes-reversed = pkgs.callPackage ./nix/tests/test-includes-reversed.nix { };
+          zonewatch-test-soa-change = pkgs.callPackage ./nix/tests/test-soa-change.nix { };
+          zonewatch-test-dynamic-zone-update = pkgs.callPackage ./nix/tests/test-dynamic-zone-update.nix { };
+          zonewatch-test-with-bind = pkgs.callPackage ./nix/tests/test-with-bind.nix { };
+          zonewatch-test-serial-overflow = pkgs.callPackage ./nix/tests/test-serial-overflow.nix { };
+          zonewatch-test-symlink = pkgs.callPackage ./nix/tests/test-symlink.nix { };
 
         # NixOS tests don't run on macOS
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
