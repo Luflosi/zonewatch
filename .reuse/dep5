@@ -3,6 +3,6 @@ Upstream-Name: zonewatch
 Upstream-Contact: Luflosi <zonewatch@luflosi.de>
 Source: https://github.com/Luflosi/zonewatch
 
-Files: *.lock
+Files: *.lock migrations/*.sql .github/renovate.json
 Copyright: 2024 Luflosi <zonewatch@luflosi.de>
 License: CC0-1.0

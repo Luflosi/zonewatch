@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
+[advisories]
+ignore = [
+  # Advisory about a vulnerability in rsa, which we don't use, but it is pulled in via sqlx due
+  # to a bug in cargo. See https://github.com/launchbadge/sqlx/issues/2911,
+  # https://github.com/rustsec/rustsec/issues/1119 and https://github.com/rust-lang/cargo/issues/10801.
+  "RUSTSEC-2023-0071"
+]

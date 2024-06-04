@@ -10,6 +10,21 @@ license = "GPL-3.0-only"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+blake3 = "1.5"
+clap = { version = "4.5", features = ["derive"] }
+color-eyre = "0.6"
+env_logger = "0.11"
+futures = "0.3"
+indoc = "2.0"
+log = "0.4"
+notify = "6.1"
+serde = "1.0"
+serde_derive = "1.0"
+sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }
+tempfile-fast = "0.3"
+thiserror = "1.0"
+tokio = { version = "1", features = ["full"] }
+toml = "0.8"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -18,4 +33,6 @@ unsafe_code = "forbid"
 enum_glob_use = "warn"
 nursery = "warn"
 pedantic = "warn"
+print_stdout = "warn"
 unwrap_used = "warn"
+use_debug = "warn"
