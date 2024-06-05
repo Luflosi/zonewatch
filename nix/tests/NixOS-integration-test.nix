@@ -14,11 +14,13 @@ self:
       description = "service that creates the directory where zonewatch writes its zone files";
       before = [ "zonewatch.service" ];
       requiredBy = [ "zonewatch.service" ];
-      serviceConfig.Type = "oneshot";
       startLimitBurst = 1;
+      serviceConfig = {
+        Type = "oneshot";
+        Group = "named";
+      };
       script = ''
         mkdir --verbose -p '/var/lib/bind/zones/'
-        chgrp named '/var/lib/bind/zones/'
         chmod 775 '/var/lib/bind/zones/'
         ls '/var/lib/bind/zones/'
         if ! [ -f "/var/lib/bind/zones/example.org.zone" ]; then
@@ -36,11 +38,13 @@ self:
       after = [ "create-bind-zones-dir.service" ];
       before = [ "zonewatch.service" "dyndnsd.service" ];
       requiredBy = [ "zonewatch.service" "dyndnsd.service" ];
-      serviceConfig.Type = "oneshot";
       startLimitBurst = 1;
+      serviceConfig = {
+        Type = "oneshot";
+        Group = "zonegen";
+      };
       script = ''
         mkdir --verbose -p '/var/lib/bind/zones/dyn/'
-        chgrp zonegen '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
         if ! [ -f "/var/lib/bind/zones/dyn/example.org.zone" ]; then
           # Create an initial file for zonewatch to read
