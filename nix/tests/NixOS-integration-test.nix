@@ -31,7 +31,6 @@ self:
       '';
     };
 
-    users.groups.zonegen = {};
     systemd.services.create-bind-dyn-dir = {
       description = "service that creates the directory where zonegen writes its zone files";
       requires = [ "create-bind-zones-dir.service" ];
@@ -75,15 +74,6 @@ self:
       fi
     '';
 
-    systemd.services.dyndnsd.serviceConfig = {
-      SupplementaryGroups = [ "zonegen" ];
-      ReadWritePaths = [ "/var/lib/bind/zones/dyn/" ];
-
-      # The tempfile-fast rust crate tries to keep the old permissions, so we need to allow this class of system calls
-      SystemCallFilter = [ "@chown" ];
-      UMask = "0022"; # Allow all processes (including BIND and zonewatch) to read the zone files (and database)
-    };
-
     systemd.services.zonewatch = {
       after = [ "bind.service" ];
       wants = [ "bind.service" ];
@@ -125,16 +115,8 @@ self:
 
     services.dyndnsd = {
       enable = true;
+      useZonegen = true;
       settings = {
-        update_program = {
-          bin = "${pkgs.zonegen}/bin/zonegen";
-          args = [ "--dir" "/var/lib/bind/zones/dyn/" ];
-          initial_stdin = "drop\n";
-          stdin_per_zone_update = "send\n";
-          final_stdin = "quit\n";
-          ipv4.stdin = "update add {domain}. {ttl} IN A {ipv4}\n";
-          ipv6.stdin = "update add {domain}. {ttl} IN AAAA {ipv6}\n";
-        };
         users = {
           alice = {
             hash = "$argon2id$v=19$m=65536,t=3,p=1$ZFRHDlJOQ3UNQRN7em14R08FIRE$0SqSQRj45ZBz1MfCPq9DVMWt7VSl96m7XtW6maIcUB0";
