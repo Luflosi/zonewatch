@@ -12,8 +12,8 @@ self:
 
     systemd.services.create-bind-zones-dir = {
       description = "service that creates the directory where zonewatch writes its zone files";
-      before = [ "zonewatch.service" ];
-      requiredBy = [ "zonewatch.service" ];
+      before = [ "zonewatch.service" "bind.service" ];
+      requiredBy = [ "zonewatch.service" "bind.service" ];
       startLimitBurst = 1;
       serviceConfig = {
         Type = "oneshot";
@@ -35,8 +35,8 @@ self:
       description = "service that creates the directory where zonegen writes its zone files";
       requires = [ "create-bind-zones-dir.service" ];
       after = [ "create-bind-zones-dir.service" ];
-      before = [ "zonewatch.service" "dyndnsd.service" ];
-      requiredBy = [ "zonewatch.service" "dyndnsd.service" ];
+      before = [ "zonewatch.service" "dyndnsd.service" "bind.service" ];
+      requiredBy = [ "zonewatch.service" "dyndnsd.service" "bind.service" ];
       startLimitBurst = 1;
       serviceConfig = {
         Type = "oneshot";
