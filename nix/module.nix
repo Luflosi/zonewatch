@@ -12,28 +12,28 @@ let
       dir = lib.mkOption {
         type = lib.types.path;
         example = "/var/lib/zonewatch/";
-        description = lib.mdDoc ''
+        description = ''
           Path to where the zone file should be generated.
         '';
       };
       reload_program_args = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         example = [ "reload" "example.org" ];
-        description = lib.mdDoc ''
+        description = ''
           Command line arguments to be passed to the reload command.
         '';
       };
       ttl = lib.mkOption {
         type = lib.types.str;
         default = "1d";
-        description = lib.mdDoc ''
+        description = ''
           The default TTL for the generated zone file.
         '';
       };
       includes = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         example = [ "/path/to/file 1.zone" "/path/to/file 2.zone" ];
-        description = lib.mdDoc ''
+        description = ''
           Absolute paths or paths relative to the corresponding zone file.
           These are included in the generated zone file with the $INCLUDE directive.
         '';
@@ -41,7 +41,7 @@ let
       soa = lib.mkOption {
         type = lib.types.submodule soaOpts;
         default = {};
-        description = lib.mdDoc ''
+        description = ''
           Attribute set of SOA options.
           Note that the name of minimum is actually misleading due to historical reasons. Instead it is the negative response caching TTL.
         '';
@@ -65,21 +65,21 @@ let
       ttl = lib.mkOption {
         type = lib.types.str;
         default = "1d";
-        description = lib.mdDoc ''
+        description = ''
           The TTL of the SOA DNS record.
         '';
       };
       mname = lib.mkOption {
         type = lib.types.str;
         example = "ns1.example.org.";
-        description = lib.mdDoc ''
+        description = ''
           The primary master name server for this zone.
         '';
       };
       rname = lib.mkOption {
         type = lib.types.str;
         example = "john\\.doe.example.org.";
-        description = lib.mdDoc ''
+        description = ''
           Email address of the administrator responsible for this zone.
           Not that there is no @ symbol. Instead a different syntax is used.
         '';
@@ -87,7 +87,7 @@ let
       refresh = lib.mkOption {
         type = lib.types.str;
         default = "1d";
-        description = lib.mdDoc ''
+        description = ''
           Number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.
           You should configure your primary DNS server to actively notify your secondary nameservers of changes, so you don't need to wait this long.
         '';
@@ -95,7 +95,7 @@ let
       retry = lib.mkOption {
         type = lib.types.str;
         default = "2h";
-        description = lib.mdDoc ''
+        description = ''
           Number of seconds after which secondary name servers should retry to request the serial number from the master if the master does not respond.
           It must be less than refresh.
         '';
@@ -103,7 +103,7 @@ let
       expire = lib.mkOption {
         type = lib.types.str;
         default = "1000h";
-        description = lib.mdDoc ''
+        description = ''
           Number of seconds after which secondary name servers should stop answering requests for this zone if the master does not respond.
           This value must be bigger than the sum of refresh and retry.
         '';
@@ -111,7 +111,7 @@ let
       minimum = lib.mkOption {
         type = lib.types.str;
         default = "1h";
-        description = lib.mdDoc ''
+        description = ''
           Used in calculating the time to live for purposes of negative caching.
           Authoritative name servers take the smaller of the SOA TTL and the SOA MINIMUM to send as the SOA TTL in negative responses.
         '';
@@ -123,14 +123,14 @@ in
 {
   options = {
     services.zonewatch = {
-      enable = lib.mkEnableOption (lib.mdDoc "the DynDNS server");
+      enable = lib.mkEnableOption "the DynDNS server";
 
       settings = {
         db = lib.mkOption {
           type = lib.types.str;
           default = "/var/lib/zonewatch/db.sqlite";
           example = "/some/other/dir/db.sqlite";
-          description = lib.mdDoc ''
+          description = ''
             Where the SQLite database should be stored.
           '';
         };
@@ -138,7 +138,7 @@ in
           type = lib.types.path;
           default = "${pkgs.coreutils}/bin/false";
           example = lib.literalExpression ''"''${pkgs.dig.dnsutils}/bin/rndc"'';
-          description = lib.mdDoc ''
+          description = ''
             Path to a program which is used to tell the DNS server to reload the zone file.
             This program is called after every time the zone file is rewritten.
           '';
@@ -147,7 +147,7 @@ in
         zones = lib.mkOption {
           type = lib.types.attrsOf (lib.types.submodule zoneOpts);
           default = {};
-          description = lib.mdDoc "Attribute set of zones.";
+          description = "Attribute set of zones.";
           example = {
             "example.org" = {
               path = "/var/lib/zonewatch/example.org.zone";
