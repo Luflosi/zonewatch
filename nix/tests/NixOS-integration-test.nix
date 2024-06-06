@@ -22,12 +22,10 @@ self:
       script = ''
         mkdir --verbose -p '/var/lib/bind/zones/'
         chmod 775 '/var/lib/bind/zones/'
-        ls '/var/lib/bind/zones/'
-        if ! [ -f "/var/lib/bind/zones/example.org.zone" ]; then
-          # Create an initial file for BIND to read
-          # BIND complains if the zone file is initially empty but it seems to be fine
-          touch '/var/lib/bind/zones/example.org.zone'
-        fi
+
+        # Create an initial file for BIND to read
+        # BIND complains if the zone file is initially empty but it seems to be fine
+        (set -o noclobber;>'/var/lib/bind/zones/example.org.zone'||true) &>/dev/null
       '';
     };
 
@@ -45,10 +43,9 @@ self:
       script = ''
         mkdir --verbose -p '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
-        if ! [ -f "/var/lib/bind/zones/dyn/example.org.zone" ]; then
-          # Create an initial file for zonewatch to read
-          touch '/var/lib/bind/zones/dyn/example.org.zone'
-        fi
+
+        # Create an initial file for zonewatch and BIND to read
+        (set -o noclobber;>'/var/lib/bind/zones/dyn/example.org.zone'||true) &>/dev/null
       '';
     };
 
