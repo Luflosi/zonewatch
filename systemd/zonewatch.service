@@ -41,7 +41,8 @@ StateDirectory=zonewatch
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged
-SystemCallFilter=@chown # The tempfile-fast rust crate tries to keep the old permissions, so we need to allow this class of system calls
+# The tempfile-fast rust crate tries to keep the old permissions, so we need to allow this class of system calls
+SystemCallFilter=@chown
 Type=simple
 UMask=0077
 
