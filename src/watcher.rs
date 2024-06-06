@@ -16,6 +16,9 @@ use tokio::{
 	time::{timeout_at, Duration, Instant},
 };
 
+// TODO: make timeout configurable
+const DEBOUNCE_TIME: Duration = Duration::from_millis(100);
+
 fn detect_change(
 	includes: &HashSet<PathBuf>,
 	res: Option<notify::Result<Event>>,
@@ -109,11 +112,13 @@ async fn async_watch(
 			}
 		}
 
-		trace!("Received first event, waiting for other events for one second");
+		trace!(
+			"Received first event, waiting for other events for {:?}",
+			DEBOUNCE_TIME
+		);
 
 		let start_time = Instant::now();
-		let duration = Duration::from_millis(100); // TODO: make timeout configurable
-		let end_time = start_time + duration;
+		let end_time = start_time + DEBOUNCE_TIME;
 		// Then wait a certain amount of time and keep track of the set of changed files in that time window
 
 		// TODO: figure out a way to only catch the Elapsed(()) error
