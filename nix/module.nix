@@ -50,6 +50,7 @@ let
             ttl = "1d";
             mname = "ns1.example.org.";
             rname = "john\\.doe.example.org.";
+            initial_serial = 1;
             refresh = "1d";
             retry = "2h";
             expire = "1000h";
@@ -82,6 +83,15 @@ let
         description = ''
           Email address of the administrator responsible for this zone.
           Not that there is no @ symbol. Instead a different syntax is used.
+        '';
+      };
+      initial_serial = lib.mkOption {
+        type = lib.types.ints.u32;
+        default = 1;
+        description = ''
+          The serial number to use when creating the zone file for the first time. This value is only used once.
+          Changing it after `zonewatch` runs for the first time has no effect.
+          If you're migrating from an existing zone file, set this to a value higher than the current serial number.
         '';
       };
       refresh = lib.mkOption {
@@ -158,6 +168,7 @@ in
                 ttl = "1d";
                 mname = "ns1.example.org.";
                 rname = "john\\.doe.example.org.";
+                initial_serial = 1;
                 refresh = "1d";
                 retry = "2h";
                 expire = "1000h";

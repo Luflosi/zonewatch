@@ -10,8 +10,6 @@ use color_eyre::eyre::{Result, WrapErr};
 use log::{debug, info, trace};
 use sqlx::{Pool, Sqlite};
 
-const INITIAL_SERIAL: u32 = 1;
-
 pub async fn process_probably_changed_includes(
 	zone_name: &str,
 	config_zone: &config::Zone,
@@ -50,10 +48,14 @@ pub async fn process_probably_changed_includes(
 			(old_zone.soa.serial, includes)
 		}
 		None => {
-			info!("Zone does not exist yet, generating new zone file with serial {INITIAL_SERIAL}");
+			let serial = config_zone.soa.initial_serial;
+			info!(
+				"Zone does not exist yet, generating new zone file with serial {}",
+				serial
+			);
 			let includes = zone_file::Include::files_from_paths(config_zone.includes.iter())
 				.wrap_err("Cannot convert include path to Include")?;
-			(INITIAL_SERIAL, includes)
+			(serial, includes)
 		}
 	};
 

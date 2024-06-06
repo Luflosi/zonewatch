@@ -33,6 +33,7 @@ let
           ttl = "1d";
           mname = "ns1.example.org.";
           rname = "john\\.doe.example.org.";
+          initial_serial = 1;
           refresh = "1d";
           retry = "2h";
           expire = "1000h";
