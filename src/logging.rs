@@ -11,7 +11,7 @@ use std::io::Write;
 // Maybe I should take a look at the tracing crate instead.
 
 pub fn setup() {
-	let env = Env::default();
+	let env = Env::default().filter_or("RUST_LOG", "zonewatch=info");
 	let mut builder = Builder::from_env(env);
 
 	match std::env::var("RUST_LOG_STYLE") {
