@@ -18,7 +18,9 @@ pub async fn process_probably_changed_includes(
 	force_write: bool,
 	pool: &Pool<Sqlite>,
 ) -> Result<()> {
+	trace!("Will begin transaction");
 	let mut tx = pool.begin().await.wrap_err("Cannot begin transaction")?;
+	trace!("Transaction began");
 
 	let maybe_old_zone = db::read_zone(zone_name, &mut tx)
 		.await
@@ -111,7 +113,9 @@ pub async fn process_probably_changed_includes(
 		}
 	}
 
+	trace!("Will end transaction");
 	tx.commit().await.wrap_err("Cannot commit transaction")?;
+	trace!("Transaction ended");
 
 	Ok(())
 }

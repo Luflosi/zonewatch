@@ -179,6 +179,7 @@ pub async fn init(path: &Path) -> Result<Pool<Sqlite>> {
 		.optimize_on_close(true, None);
 
 	let pool = SqlitePoolOptions::new()
+		.max_connections(1)
 		.connect_with(connection_options)
 		.await
 		.wrap_err_with(|| format!("Cannot open database file `{}`", path.display()))?;

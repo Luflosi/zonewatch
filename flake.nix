@@ -133,6 +133,7 @@
           zonewatch-test-with-bind = pkgs.callPackage ./nix/tests/test-with-bind.nix { };
           zonewatch-test-serial-overflow = pkgs.callPackage ./nix/tests/test-serial-overflow.nix { };
           zonewatch-test-symlink = pkgs.callPackage ./nix/tests/test-symlink.nix { };
+          zonewatch-test-two-zones = pkgs.callPackage ./nix/tests/test-two-zones.nix { };
 
         # NixOS tests don't run on macOS
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
