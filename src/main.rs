@@ -58,7 +58,8 @@ fn chain_any(
 	Ok(())
 }
 
-fn main() -> Result<()> {
+#[tokio::main()]
+async fn main() -> Result<()> {
 	color_eyre::install()?;
 
 	logging::setup();
@@ -67,6 +68,8 @@ fn main() -> Result<()> {
 
 	let config = Config::read(&args.config).wrap_err("Cannot read config file")?;
 
+	let pool = db::init(&config.db).await?;
+
 	let handles: Vec<_> = config
 		.zones
 		.into_iter()
@@ -74,7 +77,7 @@ fn main() -> Result<()> {
 			info!("Starting Thread {}", origin);
 			let builder = thread::Builder::new().name(origin.clone());
 			// TODO: find a way to pass these variables without .clone()
-			let db = config.db.clone();
+			let pool_for_thread = pool.clone();
 			let nix_dir = config.nix_dir.clone();
 			let reloader = Reloader {
 				bin: config.reload_program_bin.clone(),
@@ -83,8 +86,15 @@ fn main() -> Result<()> {
 			let only_init = args.only_init;
 			builder.spawn(move || {
 				info!("Thread {} started", origin);
-				watch(&db, &nix_dir, &origin, zone, reloader, only_init)
-					.wrap_err_with(|| format!("Cannot watch zone `{origin}`"))
+				watch(
+					pool_for_thread,
+					&nix_dir,
+					&origin,
+					zone,
+					reloader,
+					only_init,
+				)
+				.wrap_err_with(|| format!("While watching zone `{origin}`"))
 			})
 		})
 		.collect();

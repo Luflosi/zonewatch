@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::config;
-use crate::db;
 use crate::event_analyzer::{analyze_event, Changes};
 use crate::event_processor::process_probably_changed_includes;
 use crate::reloader::Reloader;
 use color_eyre::eyre::{eyre, Result, WrapErr};
 use log::{debug, trace};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
+use sqlx::{Pool, Sqlite};
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use tokio::{
@@ -34,7 +34,7 @@ fn detect_change(
 }
 
 async fn async_watch(
-	db: &Path,
+	pool: Pool<Sqlite>,
 	nix_dir: &Path,
 	zone_name: &str,
 	zone: config::Zone,
@@ -54,8 +54,6 @@ async fn async_watch(
 		Config::default(),
 	)
 	.wrap_err("Cannot create watcher")?;
-
-	let pool = db::init(db).await?;
 
 	if !only_init {
 		let include_parent_dirs: Result<HashSet<PathBuf>> = zone
@@ -146,7 +144,7 @@ async fn async_watch(
 
 #[tokio::main()]
 pub async fn watch(
-	db: &Path,
+	pool: Pool<Sqlite>,
 	nix_dir: &Path,
 	zone_name: &str,
 	zone: config::Zone,
@@ -154,6 +152,6 @@ pub async fn watch(
 	only_init: bool,
 ) -> Result<()> {
 	futures::executor::block_on(async_watch(
-		db, nix_dir, zone_name, zone, reloader, only_init,
+		pool, nix_dir, zone_name, zone, reloader, only_init,
 	))
 }
