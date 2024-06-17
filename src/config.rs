@@ -8,10 +8,15 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+fn default_nix_dir() -> PathBuf {
+	Path::new("/nix").to_path_buf()
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Raw {
 	pub db: PathBuf,
-	pub nix_dir: Option<PathBuf>,
+	#[serde(default = "default_nix_dir")]
+	pub nix_dir: PathBuf,
 	pub reload_program_bin: PathBuf,
 	pub zones: HashMap<String, ZoneRaw>,
 }
@@ -99,12 +104,9 @@ impl TryFrom<Raw> for Config {
 			})
 			.collect();
 
-		let default_nix_dir: PathBuf = Path::new("/nix").to_path_buf();
-		let nix_dir = raw_config.nix_dir.unwrap_or(default_nix_dir);
-
 		let config = Self {
 			db: raw_config.db,
-			nix_dir,
+			nix_dir: raw_config.nix_dir,
 			reload_program_bin: raw_config.reload_program_bin,
 			zones: zones?,
 		};
