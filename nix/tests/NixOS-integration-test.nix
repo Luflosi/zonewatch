@@ -181,7 +181,7 @@ self:
         machine.log(f"DNS server replied with {out}")
         assert expected == out, f"Expected `{expected}` but got `{out}`"
 
-    machine.start()
+    start_all()
     machine.wait_for_unit("bind.service")
     machine.wait_for_unit("dyndnsd.service")
     machine.wait_for_unit("zonewatch.service")
