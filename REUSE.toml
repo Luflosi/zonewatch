@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
+# SPDX-License-Identifier: CC0-1.0
+
+version = 1
+SPDX-PackageName = "zonewatch"
+SPDX-PackageSupplier = "Luflosi <zonewatch@luflosi.de>"
+SPDX-PackageDownloadLocation = "https://github.com/Luflosi/zonewatch"
+
+[[annotations]]
+path = ["**.lock", "migrations/**.sql", ".github/renovate.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Luflosi <zonewatch@luflosi.de>"
+SPDX-License-Identifier = "CC0-1.0"
