@@ -134,6 +134,7 @@
           zonewatch-test-serial-overflow = pkgs.callPackage ./nix/tests/test-serial-overflow.nix { };
           zonewatch-test-symlink = pkgs.callPackage ./nix/tests/test-symlink.nix { };
           zonewatch-test-two-zones = pkgs.callPackage ./nix/tests/test-two-zones.nix { };
+          zonewatch-test-failing-reload-program = pkgs.callPackage ./nix/tests/test-failing-reload-program.nix { };
 
         # NixOS tests don't run on macOS
         } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
