@@ -26,39 +26,36 @@ pub async fn process_probably_changed_includes(
 		.await
 		.wrap_err("Cannot read zone info")?;
 
-	let (serial, includes) = match &maybe_old_zone {
-		Some(old_zone) => {
-			let includes = match changes {
-				Changes::All => {
-					debug!("Will rescan all the files");
-					zone_file::Include::files_from_paths(config_zone.includes.iter())
-						.wrap_err("Cannot construct Include from include path")
-				}
-				Changes::Some(changed_include_paths) => {
-					debug!("This is the set of changed files: {changed_include_paths:?}");
-					let changed_files =
-						zone_file::Include::files_from_paths(changed_include_paths.iter())
-							.wrap_err("Cannot convert include path to Include")?;
-					let mut includes = old_zone.includes.clone();
-					includes.extend(changed_files);
-					Ok(includes)
-				}
-				Changes::None => Ok(old_zone.includes.clone()),
+	let (serial, includes) = if let Some(old_zone) = &maybe_old_zone {
+		let includes = match changes {
+			Changes::All => {
+				debug!("Will rescan all the files");
+				zone_file::Include::files_from_paths(config_zone.includes.iter())
+					.wrap_err("Cannot construct Include from include path")
 			}
-			.wrap_err("Cannot convert include path to Include")?;
+			Changes::Some(changed_include_paths) => {
+				debug!("This is the set of changed files: {changed_include_paths:?}");
+				let changed_files =
+					zone_file::Include::files_from_paths(changed_include_paths.iter())
+						.wrap_err("Cannot convert include path to Include")?;
+				let mut includes = old_zone.includes.clone();
+				includes.extend(changed_files);
+				Ok(includes)
+			}
+			Changes::None => Ok(old_zone.includes.clone()),
+		}
+		.wrap_err("Cannot convert include path to Include")?;
 
-			(old_zone.soa.serial, includes)
-		}
-		None => {
-			let serial = config_zone.soa.initial_serial;
-			info!(
-				"Zone does not exist yet, generating new zone file with serial {}",
-				serial
-			);
-			let includes = zone_file::Include::files_from_paths(config_zone.includes.iter())
-				.wrap_err("Cannot convert include path to Include")?;
-			(serial, includes)
-		}
+		(old_zone.soa.serial, includes)
+	} else {
+		let serial = config_zone.soa.initial_serial;
+		info!(
+			"Zone does not exist yet, generating new zone file with serial {}",
+			serial
+		);
+		let includes = zone_file::Include::files_from_paths(config_zone.includes.iter())
+			.wrap_err("Cannot convert include path to Include")?;
+		(serial, includes)
 	};
 
 	let soa = zone_file::Soa {
