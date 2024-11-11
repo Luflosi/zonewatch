@@ -11,5 +11,6 @@ allow = [
   "GPL-3.0",
   "ISC",
   "MIT",
+  "Unicode-3.0",
   "Unicode-DFS-2016",
 ]
