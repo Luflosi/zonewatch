@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 {
-  description = "Build zonewatch";
+  description = "Increment the serial number in a DNS zone file if something changes";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
