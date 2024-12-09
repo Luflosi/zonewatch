@@ -3,10 +3,11 @@
 
 # Test that the generated zone file is valid by piping it to BIND
 
-{ callPackage
-, writeText
-, runCommand
-, bind
+{
+  callPackage,
+  writeText,
+  runCommand,
+  bind,
 }:
 let
   base = callPackage ./base.nix { };

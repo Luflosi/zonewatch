@@ -3,11 +3,12 @@
 
 # Check the validity of the example config file
 
-{ lib
-, callPackage
-, runCommand
-, writeShellScriptBin
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  runCommand,
+  writeShellScriptBin,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

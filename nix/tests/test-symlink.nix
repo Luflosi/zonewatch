@@ -7,11 +7,12 @@
 # we would need to dynamically add and remove file watches as symlinks are created, altered or deleted.
 # There is a TODO item in the README.
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

@@ -3,11 +3,12 @@
 
 # Test that zonewatch detects a change made to a file while zonewatch is running
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

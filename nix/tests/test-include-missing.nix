@@ -3,12 +3,13 @@
 
 # Test that specifying an include which does not exist generates the expected zone file
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, writeText
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  writeText,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

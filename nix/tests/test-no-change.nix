@@ -3,12 +3,13 @@
 
 # Test that running zonewatch again without changes does not increase the serial number
 
-{ lib
-, callPackage
-, formats
-, writeText
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  writeText,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

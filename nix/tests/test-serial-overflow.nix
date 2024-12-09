@@ -3,11 +3,12 @@
 
 # Test that incrementing the serial number past the unsigned 32 bit limit wraps around as expected
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

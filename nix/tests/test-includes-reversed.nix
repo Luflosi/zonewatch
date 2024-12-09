@@ -3,11 +3,12 @@
 
 # Test that changing the config file by reordering two includes updates the zone file accordingly
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
 # SPDX-License-Identifier: GPL-3.0-only
 
-{ lib
-, formats
-, writeText
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  formats,
+  writeText,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   ns-record = writeText "example.org-ns-record.zone" ''

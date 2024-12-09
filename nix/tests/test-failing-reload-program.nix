@@ -3,11 +3,12 @@
 
 # Test that a failing reload command will cause zonewatch to exit with a non-zero exit code
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

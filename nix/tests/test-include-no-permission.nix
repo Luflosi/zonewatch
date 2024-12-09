@@ -3,12 +3,13 @@
 
 # Test that specifying an include which we're not allowed to read generates the expected zone file
 
-{ lib
-, callPackage
-, formats
-, runCommand
-, writeText
-, zonewatch-minimal
+{
+  lib,
+  callPackage,
+  formats,
+  runCommand,
+  writeText,
+  zonewatch-minimal,
 }:
 let
   base = callPackage ./base.nix { };

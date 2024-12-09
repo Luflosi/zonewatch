@@ -3,9 +3,10 @@
 
 # Check that the correct files are present in the package
 
-{ runCommand
-, zonewatch
-, tree
+{
+  runCommand,
+  zonewatch,
+  tree,
 }:
 runCommand "zonewatch-check-package-files" { } ''
   '${tree}/bin/tree' '${zonewatch}'
