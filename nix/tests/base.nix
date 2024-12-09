@@ -74,7 +74,7 @@ let
   state-after-initial-run = runCommand "zonewatch-initial-run" { } ''
     mkdir --verbose db
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file}'
     if ! diff '${expected-zone}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       echo 'Expected:'

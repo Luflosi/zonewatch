@@ -29,7 +29,7 @@ in
   runCommand "zonewatch-test-serial-overflow" { } ''
     mkdir --verbose db
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file-max-serial}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file-max-serial}'
     if ! diff '${expected-zone-max-serial}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       exit 1
@@ -41,7 +41,7 @@ in
       exit 1
     fi
 
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file-soa-change}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file-soa-change}'
     if ! diff '${expected-zone-soa-change}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       exit 1

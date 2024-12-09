@@ -25,7 +25,7 @@ in
     cp --verbose --no-preserve=mode -r '${base.state-after-initial-run}' 'after-initial-run'
     cd 'after-initial-run'
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file-soa-change}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file-soa-change}'
     if ! diff '${expected-zone-soa-change}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       exit 1

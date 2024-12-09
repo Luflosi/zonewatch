@@ -4,6 +4,7 @@
 # Test that the generated zone file is valid by piping it to BIND
 
 {
+  lib,
   callPackage,
   writeText,
   runCommand,
@@ -29,7 +30,7 @@ in
     }
 
     echo 'Running BIND'
-    '${bind.out}/sbin/named' -g -c '${bind-conf}' 2>&1 | while read -r line ; do
+    '${lib.getExe' bind "named"}' -g -c '${bind-conf}' 2>&1 | while read -r line ; do
       echo "$line"
 
       if [[ "$line" == *'resolver priming query complete: failure'* ]]; then

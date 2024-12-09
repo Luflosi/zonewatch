@@ -36,7 +36,7 @@ in
   runCommand "zonewatch-test-include-missing" { } ''
     mkdir --verbose db
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file-include-missing}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file-include-missing}'
     if ! diff '${expected-zone-include-missing}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       echo 'Expected:'

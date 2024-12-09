@@ -38,7 +38,7 @@ in
     touch '/tmp/file 1.zone'
     touch '/tmp/file 2.zone'
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file}'
     if ! diff '${expected-zone}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'
       exit 1

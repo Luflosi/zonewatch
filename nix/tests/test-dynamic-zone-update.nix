@@ -31,7 +31,7 @@ in
     cp --verbose --no-preserve=mode '${base.ns-record}' /tmp/ns-record.zone
 
     export RUST_LOG=zonewatch=trace
-    '${zonewatch-minimal}/bin/zonewatch' --config '${config-file-includes-tmp}' &
+    '${lib.getExe zonewatch-minimal}' --config '${config-file-includes-tmp}' &
     ZONEWATCH_PID="$!"
 
     seconds=0

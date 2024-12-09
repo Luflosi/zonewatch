@@ -28,7 +28,7 @@ in
     mkdir --verbose db
     export RUST_LOG=zonewatch=trace
     echo 'Calling zonewatch is expected to fail:'
-    ! '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file}'
+    ! '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file}'
     echo 'zonewatch failed as expected 🎉'
     if ! diff '${expected-zone}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'

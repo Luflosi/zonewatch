@@ -146,8 +146,8 @@ in
         };
         reload_program_bin = lib.mkOption {
           type = lib.types.path;
-          default = "${pkgs.coreutils}/bin/false";
-          example = lib.literalExpression ''"''${pkgs.dig.out}/bin/rndc"'';
+          default = lib.getExe' pkgs.coreutils "false";
+          example = lib.literalExpression ''lib.getExe' pkgs.dig.out "rndc"'';
           description = ''
             Path to a program which is used to tell the DNS server to reload the zone file.
             This program is called after every time the zone file is rewritten.
@@ -189,7 +189,7 @@ in
       serviceConfig = let
         settingsFile = settingsFormat.generate "zonewatch.toml" cfg.settings;
       in {
-        ExecStart = [ "" "${pkgs.zonewatch}/bin/zonewatch --config '${settingsFile}'" ];
+        ExecStart = [ "" "${lib.getExe pkgs.zonewatch} --config '${settingsFile}'" ];
       };
     };
   };

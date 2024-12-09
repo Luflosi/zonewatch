@@ -4,12 +4,17 @@
 # Check that the correct files are present in the package
 
 {
+  lib,
   runCommand,
   zonewatch,
   tree,
 }:
 runCommand "zonewatch-check-package-files" { } ''
-  '${tree}/bin/tree' '${zonewatch}'
+  '${lib.getExe tree}' '${zonewatch}'
+  if [ '${lib.getExe zonewatch}' != '${zonewatch}/bin/zonewatch' ]; then
+    echo 'The main executable does not have the expected name!'
+    exit 1
+  fi
   if [ ! -e '${zonewatch}/bin/zonewatch' ]; then
     echo 'The executable was not found!'
     exit 1

@@ -38,7 +38,7 @@ in
 
     export RUST_LOG=zonewatch=trace
 
-    { '${zonewatch-minimal}/bin/zonewatch' --config '${config-file}' & echo "$!" >"$TMPDIR/pid"; } 2>&1 | while read -r line ; do
+    { '${lib.getExe zonewatch-minimal}' --config '${config-file}' & echo "$!" >"$TMPDIR/pid"; } 2>&1 | while read -r line ; do
       echo "output: $line"
 
       if [[ "$line" == *'Reloading the zone with command '* ]]; then
@@ -65,7 +65,7 @@ in
 
     rm --verbose 'flag'
 
-    '${zonewatch-minimal}/bin/zonewatch' --only-init --config '${config-file}'
+    '${lib.getExe zonewatch-minimal}' --only-init --config '${config-file}'
 
     if ! diff '${expected-zone 2}' 'zones/example.org.zone'; then
       echo 'The zone file is different from what was expected!'

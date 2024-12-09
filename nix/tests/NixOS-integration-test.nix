@@ -92,7 +92,7 @@ self:
     # TODO: upstream the permission change into Nixpkgs
     systemd.services.bind.preStart = ''
       mkdir -m 0755 -p /etc/bind
-      (umask 227 && ${pkgs.bind.out}/sbin/rndc-confgen -c /etc/bind/rndc.key -u named -a -A hmac-sha256 2>/dev/null)
+      (umask 227 && '${lib.getExe' pkgs.bind "rndc-confgen"}' -c /etc/bind/rndc.key -u named -a -A hmac-sha256 2>/dev/null)
       ls -la /etc/bind/rndc.key
       chgrp named /etc/bind/rndc.key
       chmod 440 /etc/bind/rndc.key
@@ -138,7 +138,7 @@ self:
     services.zonewatch = {
       enable = true;
       settings = {
-        reload_program_bin = "${pkgs.dig.out}/bin/rndc";
+        reload_program_bin = lib.getExe' pkgs.dig.out "rndc";
         zones = {
           "example.org" = {
             dir = "/var/lib/bind/zones/";
