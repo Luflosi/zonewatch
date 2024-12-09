@@ -6,8 +6,6 @@
 {
   lib,
   callPackage,
-  formats,
-  writeText,
   runCommand,
   zonewatch-minimal,
 }:
