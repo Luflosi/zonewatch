@@ -133,7 +133,7 @@ in
 {
   options = {
     services.zonewatch = {
-      enable = lib.mkEnableOption "the DynDNS server";
+      enable = lib.mkEnableOption "zonewatch";
 
       settings = {
         db = lib.mkOption {
