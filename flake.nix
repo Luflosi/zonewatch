@@ -119,6 +119,17 @@
             touch "$out"
           '';
 
+          zonewatch-zizmor = pkgs.runCommand "run-zizmor" {
+            # zizmor needs this folder structure for some reason
+            src = pkgs.linkFarm "repo" [{
+              name = ".github/workflows";
+              path = ./.github/workflows;
+            }];
+          } ''
+            '${lib.getExe pkgs.zizmor}' --offline "$src"
+            touch "$out"
+          '';
+
           zonewatch-check-package-files = pkgs.callPackage ./nix/tests/check-package-files.nix { };
           zonewatch-check-example-config = pkgs.callPackage ./nix/tests/check-example-config.nix { };
           zonewatch-test-include-missing = pkgs.callPackage ./nix/tests/test-include-missing.nix { };
