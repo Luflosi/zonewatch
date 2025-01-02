@@ -43,7 +43,6 @@ self:
       script = ''
         mkdir --verbose -p '/var/lib/bind/zones/dyn/'
         chmod 775 '/var/lib/bind/zones/dyn/'
-        chgrp zonegen '/var/lib/bind/zones/dyn/'
 
         # Create an initial file for zonewatch and BIND to read
         (set -o noclobber;>'/var/lib/bind/zones/dyn/example.org.zone'||true) &>/dev/null
@@ -90,14 +89,28 @@ self:
     };
 
     # TODO: upstream the permission change into Nixpkgs
-    systemd.services.bind.preStart = ''
-      mkdir -m 0755 -p /etc/bind
-      (umask 227 && '${lib.getExe' pkgs.bind "rndc-confgen"}' -c /etc/bind/rndc.key -u named -a -A hmac-sha256 2>/dev/null)
-      ls -la /etc/bind/rndc.key
-      chgrp named /etc/bind/rndc.key
-      chmod 440 /etc/bind/rndc.key
-      ls -la /etc/bind/rndc.key
-    '';
+    systemd.tmpfiles.settings."create-ddns-key"."/etc/bind".d = {
+      user = "named";
+      group = "named";
+    };
+    systemd.services.create-ddns-key = {
+      description = "Service to create a key for the named group to authenticate to BIND";
+      before = [ "bind.service" "zonewatch.service" ];
+      requiredBy = [ "bind.service" "zonewatch.service" ];
+      script = ''
+        if ! [ -f "/etc/bind/ddns.key" ]; then
+          '${lib.getExe' pkgs.bind "rndc-confgen"}' -c /etc/bind/rndc.key -a -A hmac-sha256 2>/dev/null
+          chmod 440 /etc/bind/rndc.key
+        fi
+      '';
+      serviceConfig = {
+        Type = "oneshot";
+        StartLimitBurst = 1;
+        User = "named";
+        Group = "named";
+        UMask = "0227";
+      };
+    };
 
     services.bind = {
       enable = true;
