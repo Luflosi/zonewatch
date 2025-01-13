@@ -18,11 +18,11 @@
     },
     "crane": {
       "locked": {
-        "lastModified": 1736101677,
-        "narHash": "sha256-iKOPq86AOWCohuzxwFy/MtC8PcSVGnrxBOvxpjpzrAY=",
+        "lastModified": 1736566337,
+        "narHash": "sha256-SC0eDcZPqISVt6R0UfGPyQLrI0+BppjjtQ3wcSlk0oI=",
         "owner": "ipetkov",
         "repo": "crane",
-        "rev": "61ba163d85e5adeddc7b3a69bb174034965965b2",
+        "rev": "9172acc1ee6c7e1cbafc3044ff850c568c75a5a3",
         "type": "github"
       },
       "original": {
@@ -50,11 +50,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1735815067,
-        "narHash": "sha256-i6qdPiKordR1EDkye14CjgYY4MXinJOLW9/bvYFbBUM=",
+        "lastModified": 1736125753,
+        "narHash": "sha256-Ks8s1b4sWt+wlFyo43xG5uvci6WwfMUAYUuYWUewF5A=",
         "owner": "Luflosi",
         "repo": "dyndnsd",
-        "rev": "6f26aa75b28708a8ecde0b25ada4d19a16b357a2",
+        "rev": "57f4cdde05a36cb8eb73f3ce592434a9d7f8e44f",
         "type": "github"
       },
       "original": {
@@ -71,11 +71,11 @@
         "rust-analyzer-src": []
       },
       "locked": {
-        "lastModified": 1736058609,
-        "narHash": "sha256-IAE2l4uRHm9EfV/3o4Uz639FMKG4p4aFhsm7pVmPxxI=",
+        "lastModified": 1736663419,
+        "narHash": "sha256-1Fudfwvkp65w+V89BQrc4dyKLFGJZHtSjHxpwmWwwms=",
         "owner": "nix-community",
         "repo": "fenix",
-        "rev": "2496106635e313223d42750681211f19fa8883b8",
+        "rev": "89350fe9d9b7f77a17be0541115bfc4f52ba6e40",
         "type": "github"
       },
       "original": {
@@ -104,11 +104,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1735915915,
-        "narHash": "sha256-Q4HuFAvoKAIiTRZTUxJ0ZXeTC7lLfC9/dggGHNXNlCw=",
+        "lastModified": 1736657626,
+        "narHash": "sha256-FWlPMUzp0lkQBdhKlPqtQdqmp+/C+1MBiEytaYfrCTY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "a27871180d30ebee8aa6b11bf7fef8a52f024733",
+        "rev": "2f9e2f85cb14a46410a1399aa9ea7ecf433e422e",
         "type": "github"
       },
       "original": {
@@ -166,11 +166,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1736019779,
-        "narHash": "sha256-3CLhXlW1f4IV5PYfJV/vjIDFmRI+3/x4XG62D573kEI=",
+        "lastModified": 1736126574,
+        "narHash": "sha256-L4Eg9Y0imJ1pWjPkdJV2FZcMI5yuTVwCKJbm79hGuNU=",
         "owner": "Luflosi",
         "repo": "zonegen",
-        "rev": "e1e5669d52443a8ae67bd0206bdc0cda72624820",
+        "rev": "60cefa72ca1265cedacba9e4d61383e2b0ed65e2",
         "type": "github"
       },
       "original": {
