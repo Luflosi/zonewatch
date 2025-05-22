@@ -51,7 +51,10 @@ rec {
   # artifacts from above.
   zonewatch = craneLib.buildPackage (commonArgs // {
     inherit cargoArtifacts;
-    meta.mainProgram = "zonewatch";
+    meta = {
+      description = "Increment the serial number in a DNS zone file if something changes";
+      mainProgram = "zonewatch";
+    };
   });
 
   zonewatch-systemd-unit = pkgs.runCommand "zonewatch-systemd-unit" { } ''
@@ -61,6 +64,9 @@ rec {
   zonewatch-full = pkgs.symlinkJoin {
     name = "zonewatch-full";
     paths = [ zonewatch zonewatch-systemd-unit ];
-    meta.mainProgram = zonewatch.meta.mainProgram;
+    meta = {
+      description = zonewatch.meta.description + " (with systemd unit file)";
+      inherit (zonewatch.meta) mainProgram;
+    };
   };
 }

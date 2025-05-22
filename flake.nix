@@ -158,8 +158,10 @@
           });
         };
 
-        apps.zonewatch = flake-utils.lib.mkApp {
+        apps.zonewatch = (flake-utils.lib.mkApp {
           drv = zonewatch;
+        }) // {
+          inherit (zonewatch) meta;
         };
         apps.default = self.apps.${system}.zonewatch;
 
