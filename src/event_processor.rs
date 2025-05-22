@@ -49,10 +49,7 @@ pub async fn process_probably_changed_includes(
 		(old_zone.soa.serial, includes)
 	} else {
 		let serial = config_zone.soa.initial_serial;
-		info!(
-			"Zone does not exist yet, generating new zone file with serial {}",
-			serial
-		);
+		info!("Zone does not exist yet, generating new zone file with serial {serial}");
 		let includes = zone_file::Include::files_from_paths(config_zone.includes.iter())
 			.wrap_err("Cannot convert include path to Include")?;
 		(serial, includes)

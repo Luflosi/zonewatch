@@ -74,7 +74,7 @@ async fn main() -> Result<()> {
 		.zones
 		.into_iter()
 		.map(|(origin, zone)| {
-			info!("Starting Thread {}", origin);
+			info!("Starting Thread {origin}");
 			let builder = thread::Builder::new().name(origin.clone());
 			// TODO: find a way to pass these variables without .clone()
 			let pool_for_thread = pool.clone();
@@ -85,7 +85,7 @@ async fn main() -> Result<()> {
 			};
 			let only_init = args.only_init;
 			builder.spawn(move || {
-				info!("Thread {} started", origin);
+				info!("Thread {origin} started");
 				watch(
 					pool_for_thread,
 					&nix_dir,

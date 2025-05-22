@@ -104,16 +104,11 @@ async fn async_watch(
 				Changes::Some(_) | Changes::All => {
 					break;
 				}
-				Changes::None => {
-					continue;
-				}
+				Changes::None => {}
 			}
 		}
 
-		trace!(
-			"Received first event, waiting for other events for {:?}",
-			DEBOUNCE_TIME
-		);
+		trace!("Received first event, waiting for other events for {DEBOUNCE_TIME:?}");
 
 		let start_time = Instant::now();
 		let end_time = start_time + DEBOUNCE_TIME;
