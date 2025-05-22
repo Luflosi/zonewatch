@@ -17,5 +17,9 @@ jobs:
           persist-credentials: false
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/flake-checker-action@main
+      - uses: cachix/cachix-action@41f25c0d23388f1a854cc67abb62029877468386
+        with:
+          name: luflosi
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Run `nix flake check`
         run: nix flake check --all-systems -L
