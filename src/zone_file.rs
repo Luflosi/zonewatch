@@ -27,7 +27,7 @@ pub struct Zone {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Include {
 	Readable(Hash),
-	// Provide a better user expirience by explicitly handling the two probably most common errors
+	// Provide a better user experience by explicitly handling the two probably most common errors
 	NotFound,
 	PermissionDenied,
 	OtherError,
