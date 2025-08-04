@@ -50,11 +50,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1750639607,
-        "narHash": "sha256-mz1PYuU2IOyXAP8wxmJO0OxDyhKHYxLIz7wNGMEoa74=",
+        "lastModified": 1754302160,
+        "narHash": "sha256-xBkHYyKRX/cVnJjAnhggghy+mbN2AiUuLNeDfam5s2o=",
         "owner": "Luflosi",
         "repo": "dyndnsd",
-        "rev": "99ed9ba374095cddf60c5019bf9aef3de7d81b81",
+        "rev": "00584158af240600eefae68bd80b700d002f4f4a",
         "type": "github"
       },
       "original": {
