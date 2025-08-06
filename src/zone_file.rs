@@ -4,15 +4,19 @@
 use crate::db;
 use crate::reloader;
 use crate::reloader::Reloader;
+use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
 use blake3::Hash;
-use color_eyre::eyre::{Result, WrapErr};
+use color_eyre::eyre::{eyre, Result, WrapErr};
 use indoc::formatdoc;
 use log::{debug, error, trace, warn};
 use sqlx::{Sqlite, Transaction};
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::{fs, io::Write, path::Path};
-use tempfile_fast::Sponge;
+use std::{
+	collections::HashMap,
+	fs,
+	io::Write,
+	os::unix::fs::OpenOptionsExt as UnixOpenOptionsExt,
+	path::{Path, PathBuf},
+};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Zone {
@@ -117,16 +121,38 @@ fn construct_contents(zone: &Zone) -> String {
 
 fn write(path: &Path, data: &str, reloader: &Reloader) -> Result<()> {
 	debug!("Saving file {}", path.display());
-	let mut temp = Sponge::new_for(path).wrap_err_with(|| {
-		format!(
-			"Cannot create new Sponge for writing to new zone file {}",
+
+	// Create parent directories if they don't exist
+	let parent = path.parent();
+	if let Some(parent) = parent {
+		fs::create_dir_all(parent).wrap_err_with(|| {
+			format!(
+				"Cannot create the parent directory of the zone file {}",
+				parent.display()
+			)
+		})?;
+	} else {
+		return Err(eyre!(format!(
+			"Path `{}` does not have a parent",
 			path.display()
-		)
-	})?;
-	temp.write_all(data.as_bytes())
+		)));
+	}
+
+	let mut file = AtomicWriteFile::options()
+		.preserve_mode(false)
+		.preserve_owner(false)
+		.mode(0o444) // Only allow reading, not writing
+		.open(path)
+		.wrap_err_with(|| {
+			format!(
+				"Cannot open the new zone file {} using AtomicWriteFile",
+				path.display()
+			)
+		})?;
+	file.write_all(data.as_bytes())
 		.wrap_err_with(|| format!("Cannot write to new zone file {}", path.display()))?;
 
-	temp.commit().wrap_err_with(|| {
+	file.commit().wrap_err_with(|| {
 		format!(
 			"Cannot commit new zone file to the filesystem {}",
 			path.display()

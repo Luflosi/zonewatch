@@ -10,6 +10,7 @@ license = "GPL-3.0-only"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+atomic-write-file = { version = "0.2", features = ["unnamed-tmpfile"] }
 blake3 = "1.5"
 clap = { version = "4.5", features = ["derive"] }
 color-eyre = "0.6"
@@ -21,7 +22,6 @@ notify = "8.0"
 serde = "1.0"
 serde_derive = "1.0"
 sqlx = { version = "0.8", features = [ "runtime-tokio", "sqlite" ] }
-tempfile-fast = "0.3"
 thiserror = "2.0"
 tokio = { version = "1", features = ["full"] }
 toml = "0.8"

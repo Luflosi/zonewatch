@@ -60,15 +60,6 @@ self:
       fi
     '';
 
-    systemd.services.zonewatch.preStart = ''
-      if ! [ -w '/var/lib/bind/zones/example.org.zone' ]; then
-        # Copy the file, changing ownership
-        cp '/var/lib/bind/zones/example.org.zone' '/var/lib/bind/zones/example.org.zone.tmp'
-        # Replace the old file
-        mv '/var/lib/bind/zones/example.org.zone.tmp' '/var/lib/bind/zones/example.org.zone'
-      fi
-    '';
-
     systemd.services.zonewatch = {
       after = [ "bind.service" ];
       wants = [ "bind.service" ];
