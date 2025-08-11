@@ -50,11 +50,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1754302367,
-        "narHash": "sha256-Lsi2f19jE+Ywort4IGaZWdv7Y3wRhTEgTWpaibGoK7w=",
+        "lastModified": 1754923025,
+        "narHash": "sha256-glMXR7SOq2y8ZOlMTjUCnPjFY7NZgWeYHrrXVc+k9Ek=",
         "owner": "Luflosi",
         "repo": "dyndnsd",
-        "rev": "da1e354d5bb31d20d8b888fd949d54f2efae2deb",
+        "rev": "46dd54f6c3e941447bc9a58ab4fa039984147c00",
         "type": "github"
       },
       "original": {
@@ -166,11 +166,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1754302376,
-        "narHash": "sha256-+gbt/3++xAwzQTI+p9pkwz60urPzLGAenBZqEG6mqwg=",
+        "lastModified": 1754922120,
+        "narHash": "sha256-CJbr6nEikDnbNMJdfDh0lOv/MiND4p7IzHAIHUQoXjQ=",
         "owner": "Luflosi",
         "repo": "zonegen",
-        "rev": "48b1af62d4e93eb2da27ab99eccd36d66463faf5",
+        "rev": "ba4c304e476b784aa40a6094b653b1459b3a8e02",
         "type": "github"
       },
       "original": {

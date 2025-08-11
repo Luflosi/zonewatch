@@ -47,19 +47,6 @@ self:
       '';
     };
 
-    # Check if we have write permission on the file itself,
-    # and replace the file with a writable version if we don't.
-    # This is unfortunately not atomic.
-    # This could be avoided if the tempfile-fast rust crate allowed ignoring the ownership of the old file.
-    systemd.services.dyndnsd.preStart = ''
-      if ! [ -w '/var/lib/bind/zones/dyn/example.org.zone' ]; then
-        # Copy the file, changing ownership
-        cp '/var/lib/bind/zones/dyn/example.org.zone' '/var/lib/bind/zones/dyn/example.org.zone.tmp'
-        # Replace the old file
-        mv '/var/lib/bind/zones/dyn/example.org.zone.tmp' '/var/lib/bind/zones/dyn/example.org.zone'
-      fi
-    '';
-
     systemd.services.zonewatch = {
       after = [ "bind.service" ];
       wants = [ "bind.service" ];
