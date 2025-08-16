@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::db;
-use crate::reloader;
 use crate::reloader::Reloader;
 use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
 use blake3::Hash;
@@ -159,7 +158,7 @@ fn write(path: &Path, data: &str, reloader: &Reloader) -> Result<()> {
 		)
 	})?;
 
-	reloader::execute(reloader)?;
+	reloader.execute()?;
 
 	Ok(())
 }
