@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::db;
-use crate::reloader::Reloader;
 use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
 use blake3::Hash;
 use color_eyre::eyre::{eyre, Result, WrapErr};
@@ -118,7 +117,7 @@ fn construct_contents(zone: &Zone) -> String {
 	zone_data
 }
 
-fn write(path: &Path, data: &str, reloader: &Reloader) -> Result<()> {
+fn write(path: &Path, data: &str) -> Result<()> {
 	debug!("Saving file {}", path.display());
 
 	// Create parent directories if they don't exist
@@ -158,16 +157,10 @@ fn write(path: &Path, data: &str, reloader: &Reloader) -> Result<()> {
 		)
 	})?;
 
-	reloader.execute()?;
-
 	Ok(())
 }
 
-pub async fn sync_state_to_disc(
-	zone: Zone,
-	reloader: &Reloader,
-	tx: &mut Transaction<'_, Sqlite>,
-) -> Result<()> {
+pub async fn sync_state_to_disc(zone: Zone, tx: &mut Transaction<'_, Sqlite>) -> Result<()> {
 	db::write_state(&zone, tx)
 		.await
 		.wrap_err("Cannot sync state to database")?;
@@ -177,7 +170,7 @@ pub async fn sync_state_to_disc(
 
 	let zone_file_name = format!("{}.zone", zone.name);
 	let zone_file_path = Path::new(&zone.dir).join(zone_file_name);
-	write(&zone_file_path, &zone_file_contents, reloader).wrap_err("Cannot write new zone file")?;
+	write(&zone_file_path, &zone_file_contents).wrap_err("Cannot write new zone file")?;
 
 	Ok(())
 }

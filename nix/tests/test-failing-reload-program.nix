@@ -1,7 +1,8 @@
 # SPDX-FileCopyrightText: 2024 Luflosi <zonewatch@luflosi.de>
 # SPDX-License-Identifier: GPL-3.0-only
 
-# Test that a failing reload command will cause zonewatch to exit with a non-zero exit code
+# Test that a failing reload command will cause zonewatch to exit with a non-zero exit code.
+# Also check that the serial number is never decremented, even if the reload command fails.
 
 {
   lib,
@@ -26,7 +27,7 @@ let
   config-file-working = (formats.toml { }).generate "config-working-reload-program.toml" config-working;
 
   expected-zone-failing = base.generate-zone "example.org" config-failing.zones."example.org" 2;
-  expected-zone-working = base.generate-zone "example.org" config-working.zones."example.org" 1;
+  expected-zone-working = base.generate-zone "example.org" config-working.zones."example.org" 3;
 in
   runCommand "zonewatch-test-failing-reload-program" { } ''
     cp --verbose --no-preserve=mode -r '${base.state-after-initial-run}' 'after-initial-run'

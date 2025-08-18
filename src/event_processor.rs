@@ -66,19 +66,20 @@ fn update_zone(
 	Ok(new_zone)
 }
 
+// Returns true if the reload program needs to be executed
 async fn write_state(
 	// add needs_reloading to the name
 	zone_name: &str,
-	reloader: &Reloader,
 	force_write: bool,
 	mut new_zone: zone_file::Zone,
 	maybe_old_zone: Option<zone_file::Zone>,
 	tx: &mut Transaction<'_, Sqlite>,
-) -> Result<()> {
-	match maybe_old_zone {
+) -> Result<bool> {
+	let needs_reloading = match maybe_old_zone {
 		None => {
 			info!("Writing zone file for the first time");
-			zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
+			zone_file::sync_state_to_disc(new_zone, tx).await?;
+			true
 		}
 		Some(old_zone) => {
 			trace!("old_zone: {old_zone:?}");
@@ -91,23 +92,26 @@ async fn write_state(
 					// To fix this, I could call fsync(). But since I can also just regenerate the file
 					// every time this program starts, I'll avoid learning the semantics
 					// of fsync() on every filesystem and just write the zone file again after each start.
-					info!("Writing zone file even though nothing was changed");
-					zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
+					info!("Writing zone file even though nothing changed");
+					zone_file::sync_state_to_disc(new_zone, tx).await?;
+					true
 				} else {
 					info!(
 						"No contents of any file actually changed for zone {zone_name}, ignoring"
 					);
+					false
 				}
 			} else {
 				let serial = new_zone.soa.serial.wrapping_add(1);
 				info!("Something changed, generating new zone file and incrementing serial to {serial}");
 				new_zone.soa.serial = serial;
 
-				zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
+				zone_file::sync_state_to_disc(new_zone, tx).await?;
+				true
 			}
 		}
-	}
-	Ok(())
+	};
+	Ok(needs_reloading)
 }
 
 pub async fn process_probably_changed_includes(
@@ -127,19 +131,24 @@ pub async fn process_probably_changed_includes(
 		.wrap_err("Cannot read zone info")?;
 
 	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref())?;
-	write_state(
-		zone_name,
-		reloader,
-		force_write,
-		new_zone,
-		maybe_old_zone,
-		&mut tx,
-	)
-	.await?;
+	let needs_reloading =
+		write_state(zone_name, force_write, new_zone, maybe_old_zone, &mut tx).await?;
 
 	trace!("Will end transaction");
 	tx.commit().await.wrap_err("Cannot commit transaction")?;
 	trace!("Transaction ended");
+
+	// Reload only after committing the transaction.
+	// If the reload command fails, the updated zone file was already written to disk
+	// and the DNS server may have already seen the incremented serial number.
+	// For this reason we have to keep the new serial number.
+	if needs_reloading {
+		trace!("Will execute the reloading program");
+		reloader.execute()?;
+		trace!("Done executing the reloading program");
+	} else {
+		trace!("We don't need to call the reloading program");
+	}
 
 	Ok(())
 }
