@@ -8,24 +8,14 @@ use crate::reloader::Reloader;
 use crate::zone_file;
 use color_eyre::eyre::{Result, WrapErr};
 use log::{debug, info, trace};
-use sqlx::{Pool, Sqlite};
+use sqlx::{Pool, Sqlite, Transaction};
 
-pub async fn process_probably_changed_includes(
+fn update_zone(
 	zone_name: &str,
 	config_zone: &config::Zone,
 	changes: Changes,
-	reloader: &Reloader,
-	force_write: bool,
-	pool: &Pool<Sqlite>,
-) -> Result<()> {
-	trace!("Will begin transaction");
-	let mut tx = pool.begin().await.wrap_err("Cannot begin transaction")?;
-	trace!("Transaction began");
-
-	let maybe_old_zone = db::read_zone(zone_name, &mut tx)
-		.await
-		.wrap_err("Cannot read zone info")?;
-
+	maybe_old_zone: Option<&zone_file::Zone>,
+) -> Result<zone_file::Zone> {
 	let (serial, includes) = if let Some(old_zone) = &maybe_old_zone {
 		let includes = match changes {
 			Changes::All => {
@@ -65,7 +55,7 @@ pub async fn process_probably_changed_includes(
 		expire: config_zone.soa.expire.clone(),
 		minimum: config_zone.soa.minimum.clone(),
 	};
-	let mut new_zone = zone_file::Zone {
+	let new_zone = zone_file::Zone {
 		name: zone_name.to_string(),
 		dir: config_zone.dir.clone(),
 		ttl: config_zone.ttl.clone(),
@@ -73,11 +63,22 @@ pub async fn process_probably_changed_includes(
 		includes_ordered: config_zone.includes.clone(),
 		soa,
 	};
+	Ok(new_zone)
+}
 
+async fn write_state(
+	// add needs_reloading to the name
+	zone_name: &str,
+	reloader: &Reloader,
+	force_write: bool,
+	mut new_zone: zone_file::Zone,
+	maybe_old_zone: Option<zone_file::Zone>,
+	tx: &mut Transaction<'_, Sqlite>,
+) -> Result<()> {
 	match maybe_old_zone {
 		None => {
 			info!("Writing zone file for the first time");
-			zone_file::sync_state_to_disc(new_zone, reloader, &mut tx).await?;
+			zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
 		}
 		Some(old_zone) => {
 			trace!("old_zone: {old_zone:?}");
@@ -91,7 +92,7 @@ pub async fn process_probably_changed_includes(
 					// every time this program starts, I'll avoid learning the semantics
 					// of fsync() on every filesystem and just write the zone file again after each start.
 					info!("Writing zone file even though nothing was changed");
-					zone_file::sync_state_to_disc(new_zone, reloader, &mut tx).await?;
+					zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
 				} else {
 					info!(
 						"No contents of any file actually changed for zone {zone_name}, ignoring"
@@ -102,10 +103,39 @@ pub async fn process_probably_changed_includes(
 				info!("Something changed, generating new zone file and incrementing serial to {serial}");
 				new_zone.soa.serial = serial;
 
-				zone_file::sync_state_to_disc(new_zone, reloader, &mut tx).await?;
+				zone_file::sync_state_to_disc(new_zone, reloader, tx).await?;
 			}
 		}
 	}
+	Ok(())
+}
+
+pub async fn process_probably_changed_includes(
+	zone_name: &str,
+	config_zone: &config::Zone,
+	changes: Changes,
+	reloader: &Reloader,
+	force_write: bool,
+	pool: &Pool<Sqlite>,
+) -> Result<()> {
+	trace!("Will begin transaction");
+	let mut tx = pool.begin().await.wrap_err("Cannot begin transaction")?;
+	trace!("Transaction began");
+
+	let maybe_old_zone = db::read_zone(zone_name, &mut tx)
+		.await
+		.wrap_err("Cannot read zone info")?;
+
+	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref())?;
+	write_state(
+		zone_name,
+		reloader,
+		force_write,
+		new_zone,
+		maybe_old_zone,
+		&mut tx,
+	)
+	.await?;
 
 	trace!("Will end transaction");
 	tx.commit().await.wrap_err("Cannot commit transaction")?;
