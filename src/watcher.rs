@@ -20,20 +20,21 @@ use tokio::{
 const DEBOUNCE_TIME: Duration = Duration::from_millis(100);
 
 fn detect_change(
+	zone_name: &str,
 	includes: &HashSet<PathBuf>,
 	res: Option<notify::Result<Event>>,
 	changes: Changes,
 ) -> Result<Changes> {
 	if let Some(event) = res {
 		let event = event.wrap_err("Error from RecommendedWatcher")?;
-		let new_changes = analyze_event(includes, event);
+		let new_changes = analyze_event(zone_name, includes, event);
 		return Ok(changes.union(new_changes));
 	}
 
 	Ok(changes)
 }
 
-async fn async_watch(
+pub async fn watch(
 	pool: Pool<Sqlite>,
 	nix_dir: &Path,
 	zone_name: &str,
@@ -76,9 +77,12 @@ async fn async_watch(
 			if dir.starts_with(nix_dir) {
 				// Special case for files in the Nix Store:
 				// The contents of files in the Nix Store will never change since the files in the Nix store are immutable.
-				debug!("Not watching {} since it's in the Nix store", dir.display());
+				debug!(
+					"Not watching {} since it's in the Nix store (included in zone {zone_name})",
+					dir.display()
+				);
 			} else {
-				trace!("Watching {}", dir.display());
+				trace!("Watching {} (included in zone {zone_name})", dir.display());
 				watcher
 					// We're watching the parent directories of files so that we can also observe if the file is renamed, created or deleted
 					.watch(dir.as_ref(), RecursiveMode::NonRecursive)
@@ -99,7 +103,7 @@ async fn async_watch(
 		let mut changes = Changes::None;
 		loop {
 			let res = rx.recv().await;
-			changes = detect_change(&zone.includes_set, res, changes)?;
+			changes = detect_change(zone_name, &zone.includes_set, res, changes)?;
 			match &changes {
 				Changes::Some(_) | Changes::All => {
 					break;
@@ -108,7 +112,7 @@ async fn async_watch(
 			}
 		}
 
-		trace!("Received first event, waiting for other events for {DEBOUNCE_TIME:?}");
+		trace!("Received first event for zone {zone_name}, waiting for other events for {DEBOUNCE_TIME:?}");
 
 		let start_time = Instant::now();
 		let end_time = start_time + DEBOUNCE_TIME;
@@ -120,9 +124,9 @@ async fn async_watch(
 		// The documentation at https://docs.rs/tokio/latest/tokio/time/fn.timeout_at.html also catches all errors
 		//Err(Elapsed(_)) => todo!(),
 		while let Ok(event) = timeout_at(end_time, rx.recv()).await {
-			changes = detect_change(&zone.includes_set, event, changes)?;
+			changes = detect_change(zone_name, &zone.includes_set, event, changes)?;
 		}
-		debug!("We waited long enough");
+		debug!("We waited long enough for more changes to zone {zone_name}");
 		// Finally generate a new zone file
 		if changes == Changes::None {
 			return Err(eyre!(
@@ -133,20 +137,6 @@ async fn async_watch(
 			.await
 			.wrap_err("Cannot process probably changed includes")?;
 
-		trace!("loop");
+		trace!("loop (zone {zone_name})");
 	}
-}
-
-#[tokio::main()]
-pub async fn watch(
-	pool: Pool<Sqlite>,
-	nix_dir: &Path,
-	zone_name: &str,
-	zone: config::Zone,
-	reloader: Reloader,
-	only_init: bool,
-) -> Result<()> {
-	futures::executor::block_on(async_watch(
-		pool, nix_dir, zone_name, zone, reloader, only_init,
-	))
 }

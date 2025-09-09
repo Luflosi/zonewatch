@@ -11,6 +11,7 @@ use std::process::{Command, Stdio};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Reloader {
+	pub zone_name: String,
 	pub bin: PathBuf,
 	pub args: Vec<String>,
 }
@@ -18,7 +19,8 @@ pub struct Reloader {
 impl Reloader {
 	pub fn execute(&self) -> Result<()> {
 		info!(
-			"Reloading the zone with command `{} {}`",
+			"Reloading zone {} with command `{} {}`",
+			&self.zone_name,
 			&self.bin.display(),
 			&self.args.join(" ")
 		);

@@ -43,24 +43,28 @@ impl Changes {
 	}
 }
 
-fn check_paths(zone_paths: &HashSet<PathBuf>, event_paths: Vec<PathBuf>) -> Changes {
+fn check_paths(
+	zone_name: &str,
+	zone_paths: &HashSet<PathBuf>,
+	event_paths: Vec<PathBuf>,
+) -> Changes {
 	let event_paths: HashSet<PathBuf> = event_paths.into_iter().collect();
 	let intersection = zone_paths.intersection(&event_paths);
 	let intersection_set: HashSet<PathBuf> = intersection.cloned().collect();
 	let count = intersection_set.len();
 	if count == 0 {
-		trace!("None of the files we're interested in were changed");
+		trace!("None of the files we're interested in were changed (zone {zone_name})");
 		return Changes::None;
 	}
-	trace!("{count} file(s) we're interested in were changed");
+	trace!("{count} file(s) we're interested in were changed (zone {zone_name})");
 	Changes::Some(intersection_set)
 }
 
-pub fn analyze_event(zone_paths: &HashSet<PathBuf>, event: Event) -> Changes {
+pub fn analyze_event(zone_name: &str, zone_paths: &HashSet<PathBuf>, event: Event) -> Changes {
 	use UncertainModification::{MaybeModified, NotModified};
 
 	trace!(
-		"Event kind: {:?}, Event paths: {:?}, Event Attrs: {:?}",
+		"Zone: {zone_name}, Event kind: {:?}, Event paths: {:?}, Event Attrs: {:?}",
 		event.kind,
 		event.paths,
 		event.attrs
@@ -118,8 +122,8 @@ pub fn analyze_event(zone_paths: &HashSet<PathBuf>, event: Event) -> Changes {
 
 	match uncertain_modified_state {
 		MaybeModified => {
-			trace!("Checking if it's a file we are interested in");
-			check_paths(zone_paths, event.paths)
+			trace!("Checking if it's a file we are interested in (zone {zone_name})");
+			check_paths(zone_name, zone_paths, event.paths)
 		}
 		NotModified => Changes::None,
 	}
@@ -147,6 +151,7 @@ mod test {
 
 		init();
 
+		let zone_name = "test";
 		let path1 = PathBuf::from("/path1");
 		let path2 = PathBuf::from("/path/2");
 		let path3 = PathBuf::from("path-3");
@@ -157,32 +162,41 @@ mod test {
 		let zone_paths_empty = HashSet::new();
 		let event_paths_empty = Vec::new();
 		assert_eq!(
-			check_paths(&zone_paths_all, event_paths_all.clone()),
+			check_paths(zone_name, &zone_paths_all, event_paths_all.clone()),
 			Some(zone_paths_all.clone())
 		);
 		assert_eq!(
-			check_paths(&zone_paths_all, event_paths_one.clone()),
+			check_paths(zone_name, &zone_paths_all, event_paths_one.clone()),
 			Some(zone_paths_one.clone())
 		);
 		assert_eq!(
-			check_paths(&zone_paths_all, event_paths_empty.clone()),
+			check_paths(zone_name, &zone_paths_all, event_paths_empty.clone()),
 			None
 		);
 		assert_eq!(
-			check_paths(&zone_paths_one, event_paths_all.clone()),
+			check_paths(zone_name, &zone_paths_one, event_paths_all.clone()),
 			Some(zone_paths_one.clone())
 		);
 		assert_eq!(
-			check_paths(&zone_paths_one, event_paths_one.clone()),
+			check_paths(zone_name, &zone_paths_one, event_paths_one.clone()),
 			Some(zone_paths_one.clone())
 		);
 		assert_eq!(
-			check_paths(&zone_paths_one, event_paths_empty.clone()),
+			check_paths(zone_name, &zone_paths_one, event_paths_empty.clone()),
 			None
 		);
-		assert_eq!(check_paths(&zone_paths_empty, event_paths_all), None);
-		assert_eq!(check_paths(&zone_paths_empty, event_paths_one), None);
-		assert_eq!(check_paths(&zone_paths_empty, event_paths_empty), None);
+		assert_eq!(
+			check_paths(zone_name, &zone_paths_empty, event_paths_all),
+			None
+		);
+		assert_eq!(
+			check_paths(zone_name, &zone_paths_empty, event_paths_one),
+			None
+		);
+		assert_eq!(
+			check_paths(zone_name, &zone_paths_empty, event_paths_empty),
+			None
+		);
 	}
 
 	#[test]
@@ -198,6 +212,7 @@ mod test {
 		};
 
 		fn assert_modified(event_kind: EventKind, expect_modified: bool) {
+			let zone_name = "test";
 			let path = PathBuf::from("/path");
 			let zone_paths = HashSet::from([path.clone()]);
 			let event = Event::new(event_kind).add_path(path);
@@ -206,7 +221,7 @@ mod test {
 			} else {
 				None
 			};
-			assert_eq!(analyze_event(&zone_paths, event), expected_state);
+			assert_eq!(analyze_event(zone_name, &zone_paths, event), expected_state);
 		}
 
 		init();

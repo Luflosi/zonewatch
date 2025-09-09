@@ -405,9 +405,15 @@ pub async fn write_state(zone: &zone_file::Zone, tx: &mut Transaction<'_, Sqlite
 	let new_includes_ordered = &zone.includes_ordered;
 
 	if *new_includes == old_includes && *new_includes_ordered == old_includes_ordered {
-		debug!("Nothing about the includes changed, not saving into database");
+		debug!(
+			"Nothing about the includes in zone {} changed, not saving into database",
+			zone.name
+		);
 	} else {
-		debug!("Something about the includes changed, saving into database");
+		debug!(
+			"Something about the includes in zone {} changed, saving into database",
+			zone.name
+		);
 		sqlx::query(indoc! {"
 			DELETE FROM includes
 			WHERE zoneid = ?1;

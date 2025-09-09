@@ -48,28 +48,39 @@ pub struct Soa {
 }
 
 impl Include {
-	pub fn read_from_fs(file_path: &Path) -> Self {
+	pub fn read_from_fs(zone_name: &str, file_path: &Path) -> Self {
 		trace!("Hashing file {}", file_path.display());
 		match fs::read_to_string(file_path) {
 			Ok(contents) => {
 				let hash = blake3::hash(contents.as_bytes());
-				debug!("Hash of included file {}: {}", file_path.display(), hash);
+				debug!(
+					"Hash of file {} (included in zone {zone_name}): {}",
+					file_path.display(),
+					hash
+				);
 				Self::Readable(hash)
 			}
 			Err(e) => match e.kind() {
 				std::io::ErrorKind::NotFound => {
-					warn!("Included file {} is missing", file_path.display());
+					warn!(
+						"File {} included in zone {zone_name} is missing",
+						file_path.display()
+					);
 					Self::NotFound
 				}
 				std::io::ErrorKind::PermissionDenied => {
 					warn!(
-						"Permission denied reading included file {}",
+						"Permission denied reading file {} included in zone {zone_name}",
 						file_path.display()
 					);
 					Self::PermissionDenied
 				}
 				_ => {
-					error!("Error reading included file {}: {}", file_path.display(), e);
+					error!(
+						"Error reading file {} included in {zone_name}: {}",
+						file_path.display(),
+						e
+					);
 					Self::OtherError
 				}
 			},
@@ -77,10 +88,11 @@ impl Include {
 	}
 
 	pub fn files_from_paths<'a>(
+		zone_name: &str,
 		paths: impl Iterator<Item = &'a PathBuf>,
 	) -> HashMap<PathBuf, Self> {
 		paths
-			.map(|path| (path.clone(), Self::read_from_fs(path)))
+			.map(|path| (path.clone(), Self::read_from_fs(zone_name, path)))
 			.collect()
 	}
 }
@@ -117,8 +129,8 @@ fn construct_contents(zone: &Zone) -> String {
 	zone_data
 }
 
-fn write(path: &Path, data: &str) -> Result<()> {
-	debug!("Saving file {}", path.display());
+fn write(zone_name: &str, path: &Path, data: &str) -> Result<()> {
+	debug!("Saving file {} (zone {zone_name})", path.display());
 
 	// Create parent directories if they don't exist
 	let parent = path.parent();
@@ -166,11 +178,15 @@ pub async fn sync_state_to_disc(zone: Zone, tx: &mut Transaction<'_, Sqlite>) ->
 		.wrap_err("Cannot sync state to database")?;
 
 	let zone_file_contents = construct_contents(&zone);
-	trace!("Writing contents\n{zone_file_contents}");
+	trace!(
+		"Writing contents (zone {})\n{zone_file_contents}",
+		zone.name
+	);
 
 	let zone_file_name = format!("{}.zone", zone.name);
 	let zone_file_path = Path::new(&zone.dir).join(zone_file_name);
-	write(&zone_file_path, &zone_file_contents).wrap_err("Cannot write new zone file")?;
+	write(&zone.name, &zone_file_path, &zone_file_contents)
+		.wrap_err("Cannot write new zone file")?;
 
 	Ok(())
 }
@@ -183,9 +199,10 @@ mod test {
 	fn check_files_from_paths_empty() {
 		use std::iter;
 
+		let zone_name = "test";
 		let input = iter::empty::<&PathBuf>();
 		let expected_output = HashMap::new();
-		let actual_output = Include::files_from_paths(input);
+		let actual_output = Include::files_from_paths(zone_name, input);
 		assert_eq!(actual_output, expected_output);
 	}
 }

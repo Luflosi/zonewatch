@@ -41,12 +41,12 @@ in
     { '${lib.getExe zonewatch-minimal}' --config '${config-file}' & echo "$!" >"$TMPDIR/pid"; } 2>&1 | while read -r line ; do
       echo "output: $line"
 
-      if [[ "$line" == *'Reloading the zone with command '* ]]; then
+      if [[ "$line" == *'Reloading zone example.org with command '* ]]; then
         echo 'Initial startup complete, modifying zone file...'
         echo '@  IN A   1.1.1.1' >> /tmp/ns-record.zone
       fi
 
-      if [[ "$line" == *'None of the files we'"'"'re interested in were changed'* ]]; then
+      if [[ "$line" == *'None of the files we'"'"'re interested in were changed (zone example.org)'* ]]; then
         echo 'No changes were detected, stopping...'
         kill "$(<"$TMPDIR/pid")"
       fi

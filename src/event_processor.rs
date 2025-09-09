@@ -19,20 +19,23 @@ fn update_zone(
 	let (serial, includes) = maybe_old_zone.as_ref().map_or_else(
 		|| {
 			let serial = config_zone.soa.initial_serial;
-			info!("Zone does not exist yet, generating new zone file with serial {serial}");
-			let includes = zone_file::Include::files_from_paths(config_zone.includes.iter());
+			info!("Zone {zone_name} does not exist yet, generating new zone file with serial {serial}");
+			let includes =
+				zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter());
 			(serial, includes)
 		},
 		|old_zone| {
 			let includes = match changes {
 				Changes::All => {
-					debug!("Will rescan all the files");
-					zone_file::Include::files_from_paths(config_zone.includes.iter())
+					debug!("Will rescan all the files included in zone {zone_name}");
+					zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter())
 				}
 				Changes::Some(changed_include_paths) => {
-					debug!("This is the set of changed files: {changed_include_paths:?}");
-					let changed_files =
-						zone_file::Include::files_from_paths(changed_include_paths.iter());
+					debug!("This is the set of changed files for zone {zone_name}: {changed_include_paths:?}");
+					let changed_files = zone_file::Include::files_from_paths(
+						zone_name,
+						changed_include_paths.iter(),
+					);
 					let mut includes = old_zone.includes.clone();
 					includes.extend(changed_files);
 					includes
@@ -75,13 +78,13 @@ async fn write_state(
 ) -> Result<bool> {
 	let needs_reloading = match maybe_old_zone {
 		None => {
-			info!("Writing zone file for the first time");
+			info!("Writing zone file {zone_name} for the first time");
 			zone_file::sync_state_to_disc(new_zone, tx).await?;
 			true
 		}
 		Some(old_zone) => {
-			trace!("old_zone: {old_zone:?}");
-			trace!("new_zone: {new_zone:?}");
+			trace!("old_zone: {old_zone:?} (zone {zone_name})");
+			trace!("new_zone: {new_zone:?} (zone {zone_name})");
 			if new_zone == old_zone {
 				if force_write {
 					// It may have happened that zonewatch was shut down after the
@@ -90,7 +93,7 @@ async fn write_state(
 					// To fix this, I could call fsync(). But since I can also just regenerate the file
 					// every time this program starts, I'll avoid learning the semantics
 					// of fsync() on every filesystem and just write the zone file again after each start.
-					info!("Writing zone file even though nothing changed");
+					info!("Writing zone file {zone_name} even though nothing changed");
 					zone_file::sync_state_to_disc(new_zone, tx).await?;
 					true
 				} else {
@@ -101,7 +104,7 @@ async fn write_state(
 				}
 			} else {
 				let serial = new_zone.soa.serial.wrapping_add(1);
-				info!("Something changed, generating new zone file and incrementing serial to {serial}");
+				info!("Something changed, generating new zone file {zone_name} and incrementing serial to {serial}");
 				new_zone.soa.serial = serial;
 
 				zone_file::sync_state_to_disc(new_zone, tx).await?;
@@ -120,9 +123,9 @@ pub async fn process_probably_changed_includes(
 	force_write: bool,
 	pool: &Pool<Sqlite>,
 ) -> Result<()> {
-	trace!("Will begin transaction");
+	trace!("Will begin transaction for zone {zone_name}");
 	let mut tx = pool.begin().await.wrap_err("Cannot begin transaction")?;
-	trace!("Transaction began");
+	trace!("Transaction began for zone {zone_name}");
 
 	let maybe_old_zone = db::read_zone(zone_name, &mut tx)
 		.await
@@ -132,20 +135,20 @@ pub async fn process_probably_changed_includes(
 	let needs_reloading =
 		write_state(zone_name, force_write, new_zone, maybe_old_zone, &mut tx).await?;
 
-	trace!("Will end transaction");
+	trace!("Will end transaction for zone {zone_name}");
 	tx.commit().await.wrap_err("Cannot commit transaction")?;
-	trace!("Transaction ended");
+	trace!("Transaction ended for zone {zone_name}");
 
 	// Reload only after committing the transaction.
 	// If the reload command fails, the updated zone file was already written to disk
 	// and the DNS server may have already seen the incremented serial number.
 	// For this reason we have to keep the new serial number.
 	if needs_reloading {
-		trace!("Will execute the reloading program");
+		trace!("Will execute the reloading program for zone {zone_name}");
 		reloader.execute()?;
-		trace!("Done executing the reloading program");
+		trace!("Done executing the reloading program for zone {zone_name}");
 	} else {
-		trace!("We don't need to call the reloading program");
+		trace!("We don't need to call the reloading program for zone {zone_name}");
 	}
 
 	Ok(())
