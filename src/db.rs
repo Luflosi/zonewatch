@@ -340,9 +340,8 @@ pub async fn read_zone(
 		.await
 		.wrap_err("Cannot get the Zone ID from the database")?;
 
-	let zoneid = match maybe_zoneid {
-		None => return Ok(None),
-		Some(zoneid) => zoneid,
+	let Some(zoneid) = maybe_zoneid else {
+		return Ok(None);
 	};
 
 	let zone = sqlx::query_as::<_, Zone>(indoc! {"
