@@ -44,19 +44,20 @@ pub async fn watch(
 ) -> Result<()> {
 	let (tx, mut rx) = channel(1);
 
-	let mut watcher = RecommendedWatcher::new(
-		move |res| {
-			futures::executor::block_on(async {
-				tx.send(res)
-					.await
-					.expect("could not send event into channel");
-			});
-		},
-		Config::default(),
-	)
-	.wrap_err("Cannot create watcher")?;
-
+	let mut watcher; // Keep this variable here so it is not dropped at the end of the `if !only_init {` block
 	if !only_init {
+		watcher = RecommendedWatcher::new(
+			move |res| {
+				futures::executor::block_on(async {
+					tx.send(res)
+						.await
+						.expect("could not send event into channel");
+				});
+			},
+			Config::default(),
+		)
+		.wrap_err("Cannot create watcher")?;
+
 		let include_parent_dirs: Result<HashSet<PathBuf>> = zone
 			.includes
 			.iter()
