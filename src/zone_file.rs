@@ -78,9 +78,9 @@ impl Include {
 
 	pub fn files_from_paths<'a>(
 		paths: impl Iterator<Item = &'a PathBuf>,
-	) -> Result<HashMap<PathBuf, Self>> {
+	) -> HashMap<PathBuf, Self> {
 		paths
-			.map(|path| Ok((path.clone(), Self::read_from_fs(path))))
+			.map(|path| (path.clone(), Self::read_from_fs(path)))
 			.collect()
 	}
 }
@@ -185,8 +185,7 @@ mod test {
 
 		let input = iter::empty::<&PathBuf>();
 		let expected_output = HashMap::new();
-		let actual_output =
-			Include::files_from_paths(input).expect("This function should not return an error");
+		let actual_output = Include::files_from_paths(input);
 		assert_eq!(actual_output, expected_output);
 	}
 }

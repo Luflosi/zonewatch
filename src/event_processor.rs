@@ -15,35 +15,34 @@ fn update_zone(
 	config_zone: &config::Zone,
 	changes: Changes,
 	maybe_old_zone: Option<&zone_file::Zone>,
-) -> Result<zone_file::Zone> {
-	let (serial, includes) = if let Some(old_zone) = &maybe_old_zone {
-		let includes = match changes {
-			Changes::All => {
-				debug!("Will rescan all the files");
-				zone_file::Include::files_from_paths(config_zone.includes.iter())
-					.wrap_err("Cannot construct Include from include path")
-			}
-			Changes::Some(changed_include_paths) => {
-				debug!("This is the set of changed files: {changed_include_paths:?}");
-				let changed_files =
-					zone_file::Include::files_from_paths(changed_include_paths.iter())
-						.wrap_err("Cannot convert include path to Include")?;
-				let mut includes = old_zone.includes.clone();
-				includes.extend(changed_files);
-				Ok(includes)
-			}
-			Changes::None => Ok(old_zone.includes.clone()),
-		}
-		.wrap_err("Cannot convert include path to Include")?;
+) -> zone_file::Zone {
+	let (serial, includes) = maybe_old_zone.as_ref().map_or_else(
+		|| {
+			let serial = config_zone.soa.initial_serial;
+			info!("Zone does not exist yet, generating new zone file with serial {serial}");
+			let includes = zone_file::Include::files_from_paths(config_zone.includes.iter());
+			(serial, includes)
+		},
+		|old_zone| {
+			let includes = match changes {
+				Changes::All => {
+					debug!("Will rescan all the files");
+					zone_file::Include::files_from_paths(config_zone.includes.iter())
+				}
+				Changes::Some(changed_include_paths) => {
+					debug!("This is the set of changed files: {changed_include_paths:?}");
+					let changed_files =
+						zone_file::Include::files_from_paths(changed_include_paths.iter());
+					let mut includes = old_zone.includes.clone();
+					includes.extend(changed_files);
+					includes
+				}
+				Changes::None => old_zone.includes.clone(),
+			};
 
-		(old_zone.soa.serial, includes)
-	} else {
-		let serial = config_zone.soa.initial_serial;
-		info!("Zone does not exist yet, generating new zone file with serial {serial}");
-		let includes = zone_file::Include::files_from_paths(config_zone.includes.iter())
-			.wrap_err("Cannot convert include path to Include")?;
-		(serial, includes)
-	};
+			(old_zone.soa.serial, includes)
+		},
+	);
 
 	let soa = zone_file::Soa {
 		ttl: config_zone.soa.ttl.clone(),
@@ -55,15 +54,14 @@ fn update_zone(
 		expire: config_zone.soa.expire.clone(),
 		minimum: config_zone.soa.minimum.clone(),
 	};
-	let new_zone = zone_file::Zone {
+	zone_file::Zone {
 		name: zone_name.to_string(),
 		dir: config_zone.dir.clone(),
 		ttl: config_zone.ttl.clone(),
 		includes,
 		includes_ordered: config_zone.includes.clone(),
 		soa,
-	};
-	Ok(new_zone)
+	}
 }
 
 // Returns true if the reload program needs to be executed
@@ -130,7 +128,7 @@ pub async fn process_probably_changed_includes(
 		.await
 		.wrap_err("Cannot read zone info")?;
 
-	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref())?;
+	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref());
 	let needs_reloading =
 		write_state(zone_name, force_write, new_zone, maybe_old_zone, &mut tx).await?;
 
