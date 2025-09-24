@@ -3,13 +3,13 @@
 
 use crate::zone_file;
 use blake3::Hash;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use futures::StreamExt;
 use indoc::indoc;
 use log::debug;
 use sqlx::{
-	sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
 	Pool, Row, Sqlite, Transaction,
+	sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
 };
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};

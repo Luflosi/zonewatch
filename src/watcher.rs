@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::config;
-use crate::event_analyzer::{analyze_event, Changes};
+use crate::event_analyzer::{Changes, analyze_event};
 use crate::event_processor::process_probably_changed_includes;
 use crate::reloader::Reloader;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use log::{debug, trace};
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use sqlx::{Pool, Sqlite};
@@ -13,7 +13,7 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use tokio::{
 	sync::mpsc::channel,
-	time::{timeout_at, Duration, Instant},
+	time::{Duration, Instant, timeout_at},
 };
 
 // TODO: make timeout configurable
@@ -113,7 +113,9 @@ pub async fn watch(
 			}
 		}
 
-		trace!("Received first event for zone {zone_name}, waiting for other events for {DEBOUNCE_TIME:?}");
+		trace!(
+			"Received first event for zone {zone_name}, waiting for other events for {DEBOUNCE_TIME:?}"
+		);
 
 		let start_time = Instant::now();
 		let end_time = start_time + DEBOUNCE_TIME;

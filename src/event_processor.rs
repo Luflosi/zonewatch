@@ -19,7 +19,9 @@ fn update_zone(
 	let (serial, includes) = maybe_old_zone.as_ref().map_or_else(
 		|| {
 			let serial = config_zone.soa.initial_serial;
-			info!("Zone {zone_name} does not exist yet, generating new zone file with serial {serial}");
+			info!(
+				"Zone {zone_name} does not exist yet, generating new zone file with serial {serial}"
+			);
 			let includes =
 				zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter());
 			(serial, includes)
@@ -31,7 +33,9 @@ fn update_zone(
 					zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter())
 				}
 				Changes::Some(changed_include_paths) => {
-					debug!("This is the set of changed files for zone {zone_name}: {changed_include_paths:?}");
+					debug!(
+						"This is the set of changed files for zone {zone_name}: {changed_include_paths:?}"
+					);
 					let changed_files = zone_file::Include::files_from_paths(
 						zone_name,
 						changed_include_paths.iter(),
@@ -104,7 +108,9 @@ async fn write_state(
 				}
 			} else {
 				let serial = new_zone.soa.serial.wrapping_add(1);
-				info!("Something changed, generating new zone file {zone_name} and incrementing serial to {serial}");
+				info!(
+					"Something changed, generating new zone file {zone_name} and incrementing serial to {serial}"
+				);
 				new_zone.soa.serial = serial;
 
 				zone_file::sync_state_to_disc(new_zone, tx).await?;

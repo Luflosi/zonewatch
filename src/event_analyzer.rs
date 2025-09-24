@@ -3,8 +3,8 @@
 
 use log::trace;
 use notify::{
-	event::{AccessKind, CreateKind, DataChange, MetadataKind, ModifyKind, RemoveKind, RenameMode},
 	Event, EventKind,
+	event::{AccessKind, CreateKind, DataChange, MetadataKind, ModifyKind, RemoveKind, RenameMode},
 };
 use std::collections::HashSet;
 use std::path::PathBuf;
@@ -65,9 +65,7 @@ pub fn analyze_event(zone_name: &str, zone_paths: &HashSet<PathBuf>, event: Even
 
 	trace!(
 		"Zone: {zone_name}, Event kind: {:?}, Event paths: {:?}, Event Attrs: {:?}",
-		event.kind,
-		event.paths,
-		event.attrs
+		event.kind, event.paths, event.attrs
 	);
 	if event.need_rescan() {
 		// Some events may have been missed.
@@ -203,12 +201,12 @@ mod test {
 	fn process_event_test() {
 		use crate::event_analyzer::analyze_event;
 		use notify::{
+			Event, EventKind,
+			EventKind::{Access, Any, Create, Modify, Other, Remove},
 			event::{
 				AccessKind, AccessMode, CreateKind, DataChange, MetadataKind, ModifyKind,
 				RemoveKind, RenameMode,
 			},
-			Event, EventKind,
-			EventKind::{Access, Any, Create, Modify, Other, Remove},
 		};
 
 		fn assert_modified(event_kind: EventKind, expect_modified: bool) {

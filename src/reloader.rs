@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use color_eyre::{
-	eyre::{eyre, Result, WrapErr},
 	Help, SectionExt,
+	eyre::{Result, WrapErr, eyre},
 };
 use log::info;
 use std::path::PathBuf;

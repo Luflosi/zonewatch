@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::db;
-use atomic_write_file::{unix::OpenOptionsExt as AtomicOpenOptionsExt, AtomicWriteFile};
+use atomic_write_file::{AtomicWriteFile, unix::OpenOptionsExt as AtomicOpenOptionsExt};
 use blake3::Hash;
-use color_eyre::eyre::{eyre, Result, WrapErr};
+use color_eyre::eyre::{Result, WrapErr, eyre};
 use indoc::formatdoc;
 use log::{debug, error, trace, warn};
 use sqlx::{Sqlite, Transaction};
@@ -118,9 +118,18 @@ fn construct_contents(zone: &Zone) -> String {
 		);
 		let line = match include {
 			Include::Readable(_) => format!("$INCLUDE {}", path.display()),
-			Include::NotFound => format!("; $INCLUDE {} ; Commented out because the file was not found", path.display()),
-			Include::PermissionDenied => format!("; $INCLUDE {} ; Commented out because we didn't have permission to read the file", path.display()),
-			Include::OtherError => format!("; $INCLUDE {} ; Commented out because we couldn't read the file for some reason. Check the logs of zonewatch to find out more", path.display()),
+			Include::NotFound => format!(
+				"; $INCLUDE {} ; Commented out because the file was not found",
+				path.display()
+			),
+			Include::PermissionDenied => format!(
+				"; $INCLUDE {} ; Commented out because we didn't have permission to read the file",
+				path.display()
+			),
+			Include::OtherError => format!(
+				"; $INCLUDE {} ; Commented out because we couldn't read the file for some reason. Check the logs of zonewatch to find out more",
+				path.display()
+			),
 		};
 		zone_data.push('\n');
 		zone_data.push_str(line.as_str());
