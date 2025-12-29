@@ -52,7 +52,8 @@ self:
       wants = [ "bind.service" ];
       serviceConfig = {
         SupplementaryGroups = [ "named" ];
-        ReadWritePaths = [ "/var/lib/bind/zones/" ];
+        BindPaths = [ "/var/lib/bind/zones/" ];
+        BindReadOnlyPaths = [ "/var/lib/bind/zones/dyn/" "/etc/bind/rndc.key" ];
         Environment = [ "RUST_LOG=zonewatch=trace" ];
 
         UMask = "0022"; # Allow all processes (including BIND) to read the zone files

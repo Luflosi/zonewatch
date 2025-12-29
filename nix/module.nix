@@ -186,6 +186,7 @@ in
 
     systemd.services.zonewatch = {
       wantedBy = [ "multi-user.target" ];
+      confinement.enable = true;
       serviceConfig = let
         settingsFile = settingsFormat.generate "zonewatch.toml" cfg.settings;
       in {
