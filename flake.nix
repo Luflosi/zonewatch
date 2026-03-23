@@ -132,6 +132,7 @@
 
           zonewatch-check-package-files = pkgs.callPackage ./nix/tests/check-package-files.nix { };
           zonewatch-check-example-config = pkgs.callPackage ./nix/tests/check-example-config.nix { };
+          zonewatch-check-file-permissions = pkgs.callPackage ./nix/tests/check-file-permissions.nix { };
           zonewatch-test-include-missing = pkgs.callPackage ./nix/tests/test-include-missing.nix { };
           zonewatch-test-include-no-permission = pkgs.callPackage ./nix/tests/test-include-no-permission.nix { };
           zonewatch-test-no-change = pkgs.callPackage ./nix/tests/test-no-change.nix { };

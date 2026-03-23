@@ -36,7 +36,6 @@ If you would like to see any of the following TODO items implemented, please fil
 
 ## TODO
 - Add code to revert database migrations if the application is downgraded (e.g. after a NixOS rollback). The reversible migrations of SQLx seem to not work at all for this use-case
-- Set Read-Only file permissions for created zone files
 - Handle huge zone files by not reading each file into RAM to then pass it into the hash function but instead stream the file to the hash function
 - Test with DNS servers other than BIND
 - Log warning when a zone file `$INCLUDE`s another zone file as that file will not be monitored for changes
