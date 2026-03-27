@@ -23,8 +23,8 @@ jobs:
         with:
           persist-credentials: false
           ref: "${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '' }}"
-      - uses: "DeterminateSystems/nix-installer-action@d96bc962e61b3049ce8128d03d57a1144fa96539"
-      - uses: "DeterminateSystems/flakehub-push@c7592ea6430aad84ef0a8a3c13ced98691a1a33c"
+      - uses: "DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25"
+      - uses: "DeterminateSystems/flakehub-push@8bc0465e150974104887e9f43265c4c00ed8be11"
         with:
           visibility: "public"
           name: "Luflosi/zonewatch"
