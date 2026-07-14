@@ -50,9 +50,10 @@ pub struct Soa {
 impl Include {
 	pub fn read_from_fs(zone_name: &str, file_path: &Path) -> Self {
 		trace!("Hashing file {}", file_path.display());
-		match fs::read_to_string(file_path) {
-			Ok(contents) => {
-				let hash = blake3::hash(contents.as_bytes());
+		let mut hasher = blake3::Hasher::new();
+		match hasher.update_mmap(file_path) {
+			Ok(hasher) => {
+				let hash = hasher.finalize();
 				debug!(
 					"Hash of file {} (included in zone {zone_name}): {}",
 					file_path.display(),
