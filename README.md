@@ -40,6 +40,7 @@ If you would like to see any of the following TODO items implemented, please fil
 - Log warning when a zone file `$INCLUDE`s another zone file as that file will not be monitored for changes
 - Log warning when a zone file is a symbolic link as that file will not be monitored for changes
 - Optionally allow running completely statelessly
+- Write NixOS test that checks what happens when the NixOS configuration changes and `nixos-rebuild switch` is called
 
 
 ## License
