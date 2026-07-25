@@ -121,6 +121,15 @@
             touch "$out"
           '';
 
+          check-editorconfig = pkgs.runCommand "run-editorconfig-checker" {
+            src = ./.;
+            nativeBuildInputs = with pkgs; [ editorconfig-checker ];
+          } ''
+            cd "$src"
+            editorconfig-checker
+            touch "$out"
+          '';
+
           zonewatch-zizmor = pkgs.runCommand "run-zizmor" {
             # zizmor needs this folder structure for some reason
             src = lib.fileset.toSource {
