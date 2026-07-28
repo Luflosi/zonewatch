@@ -3,11 +3,11 @@
     "advisory-db": {
       "flake": false,
       "locked": {
-        "lastModified": 1784303558,
-        "narHash": "sha256-BOqD2VjHKAjJB8uAltrYfjhci1JoiusWsHryUTup9FM=",
+        "lastModified": 1785173221,
+        "narHash": "sha256-S9GKKXql6KlBZM6lV2aTP1ZOzqDte31b8PfS9fDiWdI=",
         "owner": "rustsec",
         "repo": "advisory-db",
-        "rev": "b5fc89b8be99e96f79194d8a6f11e9b4143b99f0",
+        "rev": "0bfde9d6a469ae503f8a6147c2dd552856cd5999",
         "type": "github"
       },
       "original": {
@@ -47,14 +47,15 @@
         ],
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "systems": "systems"
       },
       "locked": {
-        "lastModified": 1783299333,
-        "narHash": "sha256-eS1vgCBrA1+AUb6ekMwnmFynioH67yygdG2S1J43Ssw=",
+        "lastModified": 1785256224,
+        "narHash": "sha256-LjWpliPcSZvBj8gzaLtHzJJ9E30/UoJO1pnKZQhfxGk=",
         "owner": "Luflosi",
         "repo": "dyndnsd",
-        "rev": "89cc4341232a4c6879287156ae6ea28cc97dd655",
+        "rev": "32cb2aaaca12982d7e9a74ad9d3aeb1a3e672696",
         "type": "github"
       },
       "original": {
@@ -71,11 +72,11 @@
         "rust-analyzer-src": []
       },
       "locked": {
-        "lastModified": 1784539434,
-        "narHash": "sha256-TitoB4AUyAEACEfMnIFPxFrkvEMqseulDvNHvfOyu7I=",
+        "lastModified": 1785228137,
+        "narHash": "sha256-mEC1gtoL6bPy4QpurqhtNOGQeyaetspMIn4dmA+GkBs=",
         "owner": "nix-community",
         "repo": "fenix",
-        "rev": "ef671b6baee7d1c55a93ee555d5f5ca2f0e6aaa0",
+        "rev": "62014c793a319d723cde515ad3f568dab03ed530",
         "type": "github"
       },
       "original": {
@@ -86,7 +87,9 @@
     },
     "flake-utils": {
       "inputs": {
-        "systems": "systems"
+        "systems": [
+          "systems"
+        ]
       },
       "locked": {
         "lastModified": 1731533236,
@@ -104,11 +107,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1784555310,
-        "narHash": "sha256-/FCliTPgiuV1owejZFNx3Ch9irdvkOfOFl+HHZ+DrtM=",
+        "lastModified": 1785141334,
+        "narHash": "sha256-kh35kIx7el4Jk8Ki3BH9/Pn1eZYSYLJ6LMALos0zOy0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "421eebfd0ec7bccd4abe826ce62d7e6e83129493",
+        "rev": "38a4887411571457d700c51c64a6e49ead2ed5ab",
         "type": "github"
       },
       "original": {
@@ -126,21 +129,52 @@
         "fenix": "fenix",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "systems": "systems_2",
         "zonegen": "zonegen"
       }
     },
     "systems": {
       "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "lastModified": 1776166891,
+        "narHash": "sha256-bI8yrEGjrohR5hkQox7UrxDH7XqrYMwI8SL/LrJ1+S8=",
         "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "repo": "triplet",
+        "rev": "6de7bc09397911ce03636afbcf6118745ab2cda0",
         "type": "github"
       },
       "original": {
         "owner": "nix-systems",
-        "repo": "default",
+        "repo": "triplet",
+        "type": "github"
+      }
+    },
+    "systems_2": {
+      "locked": {
+        "lastModified": 1776166891,
+        "narHash": "sha256-bI8yrEGjrohR5hkQox7UrxDH7XqrYMwI8SL/LrJ1+S8=",
+        "owner": "nix-systems",
+        "repo": "triplet",
+        "rev": "6de7bc09397911ce03636afbcf6118745ab2cda0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "triplet",
+        "type": "github"
+      }
+    },
+    "systems_3": {
+      "locked": {
+        "lastModified": 1776166891,
+        "narHash": "sha256-bI8yrEGjrohR5hkQox7UrxDH7XqrYMwI8SL/LrJ1+S8=",
+        "owner": "nix-systems",
+        "repo": "triplet",
+        "rev": "6de7bc09397911ce03636afbcf6118745ab2cda0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "triplet",
         "type": "github"
       }
     },
@@ -163,14 +197,15 @@
         ],
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1783302077,
-        "narHash": "sha256-YWZRFiQw6bnNno2YoC+MessRj8KLSKTvBzfUP6keqn4=",
+        "lastModified": 1785113926,
+        "narHash": "sha256-bzVjCWmWfuny3cip+k/CkDUfJ5+NoqaDtftCXPZrlIQ=",
         "owner": "Luflosi",
         "repo": "zonegen",
-        "rev": "b8104c6a03cd92460bc33ad69953ebfca3234d14",
+        "rev": "1d2067cf244bffbb3d835574a972ac7a92e4f21c",
         "type": "github"
       },
       "original": {
