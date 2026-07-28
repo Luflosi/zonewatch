@@ -20,9 +20,9 @@ impl Reloader {
 	pub fn execute(&self) -> Result<()> {
 		info!(
 			"Reloading zone {} with command `{} {}`",
-			&self.zone_name,
-			&self.bin.display(),
-			&self.args.join(" ")
+			self.zone_name,
+			self.bin.display(),
+			self.args.join(" ")
 		);
 
 		let child = Command::new(&self.bin)
