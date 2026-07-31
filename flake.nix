@@ -31,6 +31,7 @@
       inputs.fenix.follows = "fenix";
       inputs.flake-utils.follows = "flake-utils";
       inputs.advisory-db.follows = "advisory-db";
+      inputs.systems.follows = "systems";
     };
 
     zonegen = {
@@ -41,6 +42,7 @@
       inputs.flake-utils.follows = "flake-utils";
       inputs.advisory-db.follows = "advisory-db";
       inputs.dyndnsd.follows = "dyndnsd";
+      inputs.systems.follows = "systems";
     };
   };
 
