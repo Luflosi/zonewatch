@@ -159,14 +159,14 @@
           zonewatch-test-failing-reload-program = pkgs.callPackage ./nix/tests/test-failing-reload-program.nix { };
 
         # NixOS tests don't run on macOS
-        } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        } // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
           zonewatch-e2e-test = pkgs.testers.runNixOSTest (import ./nix/tests/NixOS-integration-test.nix self);
         };
 
         packages = {
           zonewatch = zonewatch-full;
           default = self.packages.${system}.zonewatch;
-        } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        } // lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
           zonewatch-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
             inherit cargoArtifacts;
           });
