@@ -93,12 +93,25 @@ self:
       enable = true;
       forward = "only";
       forwarders = [];
-      # We refer to the file /var/lib/bind/zones/example.org.zone, which
-      # cannot be accessed from within the Nix sandbox. This causes the
-      # program, which checks the configuration, to think that the file
-      # does not exist, leading to an error.
-      # See https://github.com/NixOS/nixpkgs/pull/501959
-      checkConfig = false;
+      # The check is done in the Nix sandbox,
+      # where paths outside of the sandbox are not accessible.
+      # To avoid the check failing because it can't find some files,
+      # patch the configuration file.
+      preCheckConfig = let
+        zoneFile = pkgs.writeText "example.org.zone" ''
+          $ORIGIN example.org.
+          $TTL 3600
+          @ IN SOA ns.example.org. admin.example.org. ( 1 3h 1h 1w 1d )
+          @ IN NS ns.example.org.
+
+          ns IN A    127.0.0.1
+          ns IN AAAA ::1
+        '';
+      in ''
+        cp '${zoneFile}' "$PWD/example.org.zone"
+        substituteInPlace "$target" \
+          --replace-fail '/var/lib/bind/zones/example.org.zone' "$PWD/example.org.zone"
+      '';
       zones = {
         "example.org" = {
           file = "/var/lib/bind/zones/example.org.zone";
