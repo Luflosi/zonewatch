@@ -179,6 +179,8 @@ self:
   testScript = let
     curl-cmd = "sudo -u dyndnsd -g dyndnsd curl --fail-with-body -v --unix-socket /run/dyndnsd.sock";
   in ''
+    from datetime import timedelta
+
     def query(
         query: str,
         query_type: str,
@@ -196,10 +198,10 @@ self:
     start_all()
     machine.wait_for_unit("bind.service")
     machine.wait_for_unit("zonewatch.service")
-    machine.wait_until_succeeds("grep ' 1 ; serial' '/var/lib/bind/zones/example.org.zone'", timeout=30)
+    machine.wait_until_succeeds("grep ' 1 ; serial' '/var/lib/bind/zones/example.org.zone'", timeout=timedelta(seconds=30))
     machine.succeed("${curl-cmd} --fail-with-body -v 'http://[::1]:9841/update?user=alice&pass=123456&ipv4=2.3.4.5&ipv6=2:3:4:5:6:7:8:9'")
     # zonewatch waits a moment before it actually updates the file
-    machine.wait_until_succeeds("grep ' 2 ; serial' '/var/lib/bind/zones/example.org.zone'", timeout=30)
+    machine.wait_until_succeeds("grep ' 2 ; serial' '/var/lib/bind/zones/example.org.zone'", timeout=timedelta(seconds=30))
     query("example.org", "A", "2.3.4.5")
     query("example.org", "AAAA", "2:3:4:1::5")
     query("test.example.org", "A", "2.3.4.5")
