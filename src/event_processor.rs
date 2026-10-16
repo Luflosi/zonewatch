@@ -151,7 +151,7 @@ pub async fn process_probably_changed_includes(
 	// For this reason we have to keep the new serial number.
 	if needs_reloading {
 		trace!("Will execute the reloading program for zone {zone_name}");
-		reloader.execute()?;
+		reloader.execute().await?;
 		trace!("Done executing the reloading program for zone {zone_name}");
 	} else {
 		trace!("We don't need to call the reloading program for zone {zone_name}");

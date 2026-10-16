@@ -7,7 +7,8 @@ use color_eyre::{
 };
 use log::info;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::Stdio;
+use tokio::process::Command;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Reloader {
@@ -17,7 +18,7 @@ pub struct Reloader {
 }
 
 impl Reloader {
-	pub fn execute(&self) -> Result<()> {
+	pub async fn execute(&self) -> Result<()> {
 		info!(
 			"Reloading zone {} with command `{} {}`",
 			self.zone_name,
@@ -35,6 +36,7 @@ impl Reloader {
 
 		let output = child
 			.wait_with_output()
+			.await
 			.wrap_err("Cannot wait for output from updater process")?;
 
 		if !output.status.success() {
