@@ -15,6 +15,7 @@ use std::{
 	os::unix::fs::OpenOptionsExt as UnixOpenOptionsExt,
 	path::{Path, PathBuf},
 };
+use tokio::task;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Zone {
@@ -195,7 +196,10 @@ pub async fn sync_state_to_disc(zone: Zone, tx: &mut Transaction<'_, Sqlite>) ->
 
 	let zone_file_name = format!("{}.zone", zone.name);
 	let zone_file_path = Path::new(&zone.dir).join(zone_file_name);
-	write(&zone.name, &zone_file_path, &zone_file_contents)
+
+	task::spawn_blocking(move || write(&zone.name, &zone_file_path, &zone_file_contents))
+		.await
+		.wrap_err("Cannot join the task that writes the zone file")?
 		.wrap_err("Cannot write new zone file")?;
 
 	Ok(())
