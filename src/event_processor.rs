@@ -10,27 +10,29 @@ use color_eyre::eyre::{Result, WrapErr};
 use log::{debug, info, trace};
 use sqlx::{Pool, Sqlite, Transaction};
 
-fn update_zone(
+async fn update_zone(
 	zone_name: &str,
 	config_zone: &config::Zone,
 	changes: Changes,
 	maybe_old_zone: Option<&zone_file::Zone>,
-) -> zone_file::Zone {
-	let (serial, includes) = maybe_old_zone.as_ref().map_or_else(
-		|| {
+) -> Result<zone_file::Zone> {
+	let (serial, includes) = match maybe_old_zone {
+		None => {
 			let serial = config_zone.soa.initial_serial;
 			info!(
 				"Zone {zone_name} does not exist yet, generating new zone file with serial {serial}"
 			);
 			let includes =
-				zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter());
+				zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter())
+					.await?;
 			(serial, includes)
-		},
-		|old_zone| {
+		}
+		Some(old_zone) => {
 			let includes = match changes {
 				Changes::All => {
 					debug!("Will rescan all the files included in zone {zone_name}");
 					zone_file::Include::files_from_paths(zone_name, config_zone.includes.iter())
+						.await?
 				}
 				Changes::Some(changed_include_paths) => {
 					debug!(
@@ -39,7 +41,8 @@ fn update_zone(
 					let changed_files = zone_file::Include::files_from_paths(
 						zone_name,
 						changed_include_paths.iter(),
-					);
+					)
+					.await?;
 					let mut includes = old_zone.includes.clone();
 					includes.extend(changed_files);
 					includes
@@ -48,8 +51,8 @@ fn update_zone(
 			};
 
 			(old_zone.soa.serial, includes)
-		},
-	);
+		}
+	};
 
 	let soa = zone_file::Soa {
 		ttl: config_zone.soa.ttl.clone(),
@@ -61,14 +64,14 @@ fn update_zone(
 		expire: config_zone.soa.expire.clone(),
 		minimum: config_zone.soa.minimum.clone(),
 	};
-	zone_file::Zone {
+	Ok(zone_file::Zone {
 		name: zone_name.to_string(),
 		dir: config_zone.dir.clone(),
 		ttl: config_zone.ttl.clone(),
 		includes,
 		includes_ordered: config_zone.includes.clone(),
 		soa,
-	}
+	})
 }
 
 // Returns true if the reload program needs to be executed
@@ -137,7 +140,9 @@ pub async fn process_probably_changed_includes(
 		.await
 		.wrap_err("Cannot read zone info")?;
 
-	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref());
+	let new_zone = update_zone(zone_name, config_zone, changes, maybe_old_zone.as_ref())
+		.await
+		.wrap_err("Cannot update zone")?;
 	let needs_reloading =
 		write_state(zone_name, force_write, new_zone, maybe_old_zone, &mut tx).await?;
 

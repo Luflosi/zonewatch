@@ -5,6 +5,7 @@ use crate::db;
 use atomic_write_file::{AtomicWriteFile, unix::OpenOptionsExt as AtomicOpenOptionsExt};
 use blake3::Hash;
 use color_eyre::eyre::{Result, WrapErr, eyre};
+use futures::future;
 use indoc::formatdoc;
 use log::{debug, error, trace, warn};
 use sqlx::{Sqlite, Transaction};
@@ -89,13 +90,24 @@ impl Include {
 		}
 	}
 
-	pub fn files_from_paths<'a>(
+	pub async fn files_from_paths<'a>(
 		zone_name: &str,
 		paths: impl Iterator<Item = &'a PathBuf>,
-	) -> HashMap<PathBuf, Self> {
-		paths
-			.map(|path| (path.clone(), Self::read_from_fs(zone_name, path)))
-			.collect()
+	) -> Result<HashMap<PathBuf, Self>> {
+		// Reading and hashing the files may take a while, so don't block a tokio worker thread.
+		// Spawn one task per file so that multiple files can be hashed in parallel.
+		let tasks = paths.map(|path| {
+			let zone_name = zone_name.to_string();
+			let path = path.clone();
+			task::spawn_blocking(move || {
+				let include = Self::read_from_fs(&zone_name, &path);
+				(path, include)
+			})
+		});
+		let includes = future::try_join_all(tasks)
+			.await
+			.wrap_err("Cannot join a task that hashes an included file")?;
+		Ok(includes.into_iter().collect())
 	}
 }
 
@@ -209,14 +221,16 @@ pub async fn sync_state_to_disc(zone: Zone, tx: &mut Transaction<'_, Sqlite>) ->
 mod test {
 	use crate::zone_file::{HashMap, Include, PathBuf};
 
-	#[test]
-	fn check_files_from_paths_empty() {
+	#[tokio::test]
+	async fn check_files_from_paths_empty() {
 		use std::iter;
 
 		let zone_name = "test";
 		let input = iter::empty::<&PathBuf>();
 		let expected_output = HashMap::new();
-		let actual_output = Include::files_from_paths(zone_name, input);
+		let actual_output = Include::files_from_paths(zone_name, input)
+			.await
+			.expect("Hashing no files should never fail");
 		assert_eq!(actual_output, expected_output);
 	}
 }
