@@ -48,11 +48,8 @@ pub async fn watch(
 	if !only_init {
 		watcher = RecommendedWatcher::new(
 			move |res| {
-				futures::executor::block_on(async {
-					tx.send(res)
-						.await
-						.expect("could not send event into channel");
-				});
+				tx.blocking_send(res)
+					.expect("could not send event into channel");
 			},
 			Config::default(),
 		)
